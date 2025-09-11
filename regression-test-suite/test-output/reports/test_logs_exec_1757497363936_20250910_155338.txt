@@ -1,0 +1,195 @@
+Test Execution Logs
+==================
+Execution ID: exec_1757497363936
+Generated: 2025-09-10 15:53:38
+
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:45:51.955222Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:45:51.955222Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:46:37.182612Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:46:58.485177Z
+Message: API:GitHubRoot status=200
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:48:59.968128Z
+Message: API:GitHubRoot status=200
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:51:54.997487Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:52:15.191894Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:52:32.226814Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:52:32.285958Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T05:13:26.816639Z
+Message: UI Test passed - Page title: Swag Labs
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T05:40:43.233601Z
+Message: UI Test passed - Page title: Swag Labs
+---
+Test Case: BlazeDemo_HomePage_Test
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.392665Z
+Message: BlazeDemo home page loaded successfully - Title: BlazeDemo
+---
+Test Case: BlazeDemo_Dropdown_Test
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.383804Z
+Message: Dropdown test passed - Departure options: 7, Destination options: 7
+---
+Test Case: BlazeDemo_FlightSearch_Boston_London
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.376456Z
+Message: Flight search successful from Boston to London
+---
+Test Case: BlazeDemo_FlightSearch_NewYork_Paris
+Type: UI
+Status: FAILED
+Executed At: 2025-09-10T09:43:19.268446Z
+Message: Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.26.0', revision: '8ccf0219d7'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '24.0.2'
+Driver info: driver.version: unknown
+---
+Test Case: BlazeDemo_ChooseFirstFlight
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.327045Z
+Message: Flight selection successful
+---
+Test Case: BlazeDemo_PriceConsistency
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:22.272395Z
+Message: Price consistency check completed
+---
+Test Case: BlazeDemo_CompleteBooking_Valid
+Type: UI
+Status: FAILED
+Executed At: 2025-09-10T09:43:19.373438Z
+Message: Valid booking failed: Expected condition failed: waiting for presence of element located by: By.id: inputName (tried for 10 second(s) with 500 milliseconds interval)
+---
+Test Case: BlazeDemo_Booking_EmptyFields
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.447559Z
+Message: Empty fields validation test completed
+---
+Test Case: BlazeDemo_Booking_InvalidCard
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.379453Z
+Message: Invalid card test completed
+---
+Test Case: BlazeDemo_EndToEnd_Flow
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T09:43:19.268446Z
+Message: End-to-end flow completed successfully - Thank you for your purchase today!
+---
+Test Case: ReqRes_GetUsers_Page2
+Type: API
+Status: PASSED
+Executed At: 2025-09-10T09:43:46.155031Z
+Message: Get users page 2 successful - Status: 200
+---
+Test Case: ReqRes_GetSingleUser_Valid
+Type: API
+Status: PASSED
+Executed At: 2025-09-10T09:43:46.253579Z
+Message: Get single user (id=2) successful - Status: 200
+---
+Test Case: ReqRes_GetSingleUser_NotFound
+Type: API
+Status: PASSED
+Executed At: 2025-09-10T09:43:46.695415Z
+Message: Get single user (id=23) not found test successful - Status: 404
+---
+Test Case: ReqRes_CreateUser
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:46.941461Z
+Message: Create user failed - Status: 401
+---
+Test Case: ReqRes_UpdateUser_PUT
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:50.337217Z
+Message: Update user (PUT) failed - Status: 401
+---
+Test Case: ReqRes_PatchUser
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:50.337217Z
+Message: Patch user failed - Status: 401
+---
+Test Case: ReqRes_DeleteUser
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:50.337217Z
+Message: Delete user failed - Status: 401
+---
+Test Case: ReqRes_Register_Valid
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:50.673447Z
+Message: Register with valid details failed - Status: 401
+---
+Test Case: ReqRes_Register_MissingPassword
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:50.894719Z
+Message: Register with missing password test failed - Expected 400, got: 401
+---
+Test Case: ReqRes_Login_Valid
+Type: API
+Status: FAILED
+Executed At: 2025-09-10T09:43:51.105496Z
+Message: Login with valid credentials failed - Status: 401
+---

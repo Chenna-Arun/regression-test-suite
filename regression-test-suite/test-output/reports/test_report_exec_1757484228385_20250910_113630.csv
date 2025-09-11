@@ -1,0 +1,12 @@
+Test Case ID,Test Case Name,Type,Status,Executed At,Message
+1,"SwagLogin",UI,PASSED,2025-09-09T13:45:51.955222Z,"UI:SwagLogin Title=Swag Labs"
+2,"GitHubRoot",API,PASSED,2025-09-09T13:45:51.955222Z,"API:GitHubRoot status=200"
+1,"SwagLogin",UI,PASSED,2025-09-09T13:46:37.182612Z,"UI:SwagLogin Title=Swag Labs"
+2,"GitHubRoot",API,PASSED,2025-09-09T13:46:58.485177Z,"API:GitHubRoot status=200"
+2,"GitHubRoot",API,PASSED,2025-09-09T13:48:59.968128Z,"API:GitHubRoot status=200"
+2,"GitHubRoot",API,PASSED,2025-09-09T13:51:54.997487Z,"API:GitHubRoot status=200"
+1,"SwagLogin",UI,PASSED,2025-09-09T13:52:15.191894Z,"UI:SwagLogin Title=Swag Labs"
+1,"SwagLogin",UI,PASSED,2025-09-09T13:52:32.226814Z,"UI:SwagLogin Title=Swag Labs"
+2,"GitHubRoot",API,PASSED,2025-09-09T13:52:32.285958Z,"API:GitHubRoot status=200"
+1,"SwagLogin",UI,PASSED,2025-09-10T05:13:26.816639Z,"UI Test passed - Page title: Swag Labs"
+1,"SwagLogin",UI,PASSED,2025-09-10T05:40:43.233601Z,"UI Test passed - Page title: Swag Labs"

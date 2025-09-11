@@ -1,0 +1,706 @@
+{
+	"info": {
+		"_postman_id": "c06a1c53-006f-4490-8b60-cd606b248789",
+		"name": "20 Test Cases - BlazeDemo UI + ReqRes API",
+		"description": "Complete collection for creating and executing 20 test cases (10 BlazeDemo UI + 10 ReqRes API) in parallel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44901079"
+	},
+	"item": [
+		{
+			"name": "1. Create UI Test Cases - BlazeDemo",
+			"item": [
+				{
+					"name": "BlazeDemo_HomePage_Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_HomePage_Test\",\n  \"type\": \"UI\",\n  \"description\": \"US-301 TC-301.1: Verify BlazeDemo home page loads correctly\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_Dropdown_Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_Dropdown_Test\",\n  \"type\": \"UI\",\n  \"description\": \"US-301 TC-301.2: Verify dropdown options display correct cities\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_FlightSearch_Boston_London",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_FlightSearch_Boston_London\",\n  \"type\": \"UI\",\n  \"description\": \"US-302 TC-302.1: Search flights from Boston to London\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_FlightSearch_NewYork_Paris",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_FlightSearch_NewYork_Paris\",\n  \"type\": \"UI\",\n  \"description\": \"US-302 TC-302.2: Search flights from New York to Paris\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_ChooseFirstFlight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_ChooseFirstFlight\",\n  \"type\": \"UI\",\n  \"description\": \"US-303 TC-303.1: Choose first available flight\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_PriceConsistency",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_PriceConsistency\",\n  \"type\": \"UI\",\n  \"description\": \"US-303 TC-303.2: Verify price consistency across pages\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_CompleteBooking_Valid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_CompleteBooking_Valid\",\n  \"type\": \"UI\",\n  \"description\": \"US-304 TC-304.1: Complete booking with valid details\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_Booking_EmptyFields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_Booking_EmptyFields\",\n  \"type\": \"UI\",\n  \"description\": \"US-304 TC-304.2: Booking with empty fields (negative test)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_Booking_InvalidCard",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_Booking_InvalidCard\",\n  \"type\": \"UI\",\n  \"description\": \"US-304 TC-304.3: Booking with invalid card (negative test)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BlazeDemo_EndToEnd_Flow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"BlazeDemo_EndToEnd_Flow\",\n  \"type\": \"UI\",\n  \"description\": \"US-305 TC-305.1: Complete end-to-end booking flow\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Create API Test Cases - ReqRes",
+			"item": [
+				{
+					"name": "ReqRes_GetUsers_Page2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_GetUsers_Page2\",\n  \"type\": \"API\",\n  \"description\": \"US-401 TC-401.1: Get list of users (page 2)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_GetSingleUser_Valid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_GetSingleUser_Valid\",\n  \"type\": \"API\",\n  \"description\": \"US-401 TC-401.2: Get single user (id=2)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_GetSingleUser_NotFound",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_GetSingleUser_NotFound\",\n  \"type\": \"API\",\n  \"description\": \"US-401 TC-401.3: Get single user (id=23, not found)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_CreateUser",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_CreateUser\",\n  \"type\": \"API\",\n  \"description\": \"US-402 TC-402.1: Create new user\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_UpdateUser_PUT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_UpdateUser_PUT\",\n  \"type\": \"API\",\n  \"description\": \"US-402 TC-402.2: Update user (PUT method)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_PatchUser",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_PatchUser\",\n  \"type\": \"API\",\n  \"description\": \"US-402 TC-402.3: Patch user information\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_DeleteUser",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_DeleteUser\",\n  \"type\": \"API\",\n  \"description\": \"US-402 TC-402.4: Delete user\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_Register_Valid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_Register_Valid\",\n  \"type\": \"API\",\n  \"description\": \"US-403 TC-403.1: Register with valid details\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_Register_MissingPassword",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_Register_MissingPassword\",\n  \"type\": \"API\",\n  \"description\": \"US-403 TC-403.2: Register with missing password (negative test)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReqRes_Login_Valid",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ReqRes_Login_Valid\",\n  \"type\": \"API\",\n  \"description\": \"US-403 TC-403.3: Login with valid credentials\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tests/integrate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests",
+								"integrate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Execute All Tests in Parallel",
+			"item": [
+				{
+					"name": "Execute All 20 Tests - Parallel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"testCaseIds\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],\n  \"mode\": \"PARALLEL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/schedule/run",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"run"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Monitor Execution",
+			"item": [
+				{
+					"name": "Check Execution Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/schedule/execution/status/{{executionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"execution",
+								"status",
+								"{{executionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Execution Statuses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/schedule/execution/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"execution",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Generate Reports",
+			"item": [
+				{
+					"name": "Generate HTML and CSV Reports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/generate?executionId={{executionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"generate"
+							],
+							"query": [
+								{
+									"key": "executionId",
+									"value": "{{executionId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. View All Test Cases",
+			"item": [
+				{
+					"name": "Get All Test Cases",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tests",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tests"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "executionId",
+			"value": ""
+		}
+	]
+}

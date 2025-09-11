@@ -1,0 +1,71 @@
+Test Execution Logs
+==================
+Execution ID: exec_1757484228385
+Generated: 2025-09-10 11:36:31
+
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:45:51.955222Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:45:51.955222Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:46:37.182612Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:46:58.485177Z
+Message: API:GitHubRoot status=200
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:48:59.968128Z
+Message: API:GitHubRoot status=200
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:51:54.997487Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:52:15.191894Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-09T13:52:32.226814Z
+Message: UI:SwagLogin Title=Swag Labs
+---
+Test Case: GitHubRoot
+Type: API
+Status: PASSED
+Executed At: 2025-09-09T13:52:32.285958Z
+Message: API:GitHubRoot status=200
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T05:13:26.816639Z
+Message: UI Test passed - Page title: Swag Labs
+---
+Test Case: SwagLogin
+Type: UI
+Status: PASSED
+Executed At: 2025-09-10T05:40:43.233601Z
+Message: UI Test passed - Page title: Swag Labs
+---
