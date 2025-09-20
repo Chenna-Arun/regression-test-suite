@@ -1,0 +1,4 @@
+{
+  "test": "ReqRes_PatchUser",
+  "url": "https://reqres.in/api"
+}

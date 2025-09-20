@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_DeleteUser",
+  "method": "DELETE",
+  "url": "https://jsonplaceholder.typicode.com/users/2",
+  "body": null
+}

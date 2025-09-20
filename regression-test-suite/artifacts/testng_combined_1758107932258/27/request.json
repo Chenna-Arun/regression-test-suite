@@ -1,0 +1,4 @@
+{
+  "test": "ReqRes_GetSingleUser_Valid",
+  "url": "https://reqres.in/api"
+}

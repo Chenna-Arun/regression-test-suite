@@ -1,0 +1,271 @@
+]{
+	"info": {
+		"_postman_id": "3eed6ff9-da4b-4ea1-91b6-acbe9ed31624",
+		"name": "Regression - Run 20 Tests (UI 6-15, API 26-35), Reports & Artifacts",
+		"description": "Run all 20 tests by testCaseIds (UI: 6-15, API: 26-35) with optional scheduledTime, monitor status, generate reports, and download HTML/CSV/JUnit and artifacts.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44901079"
+	},
+	"item": [
+		{
+			"name": "1. Run All 20 Tests",
+			"item": [
+				{
+					"name": "Run All 20 - Scheduled (PARALLEL, max 8, headless)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"testCaseIds\": [6,7,8,9,10,11,12,13,14,15,26,27,28,29,30,31,32,33,34,35],\n  \"mode\": \"PARALLEL\",\n  \"maxParallelTests\": 8,\n  \"headless\": true,\n  \"scheduledTime\": \"{{scheduledTime}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/schedule/run",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"run"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Run All 20 - Immediate (PARALLEL, max 8, headless)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"testCaseIds\": [6,7,8,9,10,11,12,13,14,15,26,27,28,29,30,31,32,33,34,35],\n  \"mode\": \"PARALLEL\",\n  \"maxParallelTests\": 8,\n  \"headless\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/schedule/run",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"run"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Monitor Executions",
+			"item": [
+				{
+					"name": "Get Execution Status (by executionId)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/schedule/execution/status/{{executionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"execution",
+								"status",
+								"{{executionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Execution Statuses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/schedule/execution/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"schedule",
+								"execution",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Generate Reports",
+			"item": [
+				{
+					"name": "Generate HTML/CSV/Logs for execution",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/generate?executionId={{executionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"generate"
+							],
+							"query": [
+								{
+									"key": "executionId",
+									"value": "{{executionId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Download Reports",
+			"item": [
+				{
+					"name": "Download HTML",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/{{executionId}}/download?type=html",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"{{executionId}}",
+								"download"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "html"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download CSV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/{{executionId}}/download?type=csv",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"{{executionId}}",
+								"download"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "csv"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download JUnit XML",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/{{executionId}}/download?type=junit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"{{executionId}}",
+								"download"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "junit"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Download Artifacts",
+			"item": [
+				{
+					"name": "Download Artifact (PNG or JSON)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/artifacts/{{executionId}}/{{testCaseId}}/{{artifactFile}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"artifacts",
+								"{{executionId}}",
+								"{{testCaseId}}",
+								"{{artifactFile}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "executionId",
+			"value": ""
+		},
+		{
+			"key": "scheduledTime",
+			"value": "2025-09-12T22:00:00+05:30"
+		},
+		{
+			"key": "testCaseId",
+			"value": ""
+		},
+		{
+			"key": "artifactFile",
+			"value": ""
+		}
+	]
+}

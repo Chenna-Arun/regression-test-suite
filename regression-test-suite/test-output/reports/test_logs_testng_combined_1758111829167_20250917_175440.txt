@@ -1,0 +1,129 @@
+Test Execution Logs
+==================
+Execution ID: testng_combined_1758111829167
+Generated: 2025-09-17 17:54:40
+
+Test Case: BlazeDemo_HomePage_Test
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.955850Z
+Message: BlazeDemo home page loaded successfully - Title: BlazeDemo
+---
+Test Case: BlazeDemo_Dropdown_Test
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.699684Z
+Message: Dropdown test passed - Departure options: 7, Destination options: 7
+---
+Test Case: BlazeDemo_FlightSearch_Boston_London
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.837324Z
+Message: Flight search successful from Boston to London
+---
+Test Case: BlazeDemo_FlightSearch_NewYork_Paris
+Type: UI
+Status: FAILED
+Executed At: 2025-09-17T12:24:01.695685Z
+Message: Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.27.0', revision: 'd6e718d134'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '24.0.2'
+Driver info: driver.version: unknown | Screenshot: artifacts\unknown\9\FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250917_175407.png
+---
+Test Case: BlazeDemo_ChooseFirstFlight
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.829327Z
+Message: Flight selection successful
+---
+Test Case: BlazeDemo_PriceConsistency
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.820328Z
+Message: Price consistency check completed
+---
+Test Case: BlazeDemo_CompleteBooking_Valid
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.903851Z
+Message: Valid booking completed successfully
+---
+Test Case: BlazeDemo_Booking_EmptyFields
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:01.812326Z
+Message: Empty fields validation test completed
+---
+Test Case: BlazeDemo_Booking_InvalidCard
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:16.577557Z
+Message: Invalid card test completed
+---
+Test Case: BlazeDemo_EndToEnd_Flow
+Type: UI
+Status: PASSED
+Executed At: 2025-09-17T12:24:18.048053Z
+Message: End-to-end flow completed successfully - Thank you for your purchase today!
+---
+Test Case: ReqRes_GetUsers_Page2
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:14.326940Z
+Message: Get users page 2 successful - Status: 200
+---
+Test Case: ReqRes_GetSingleUser_Valid
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:14.326940Z
+Message: Get single user (id=2) successful - Status: 200
+---
+Test Case: ReqRes_GetSingleUser_NotFound
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:18.938725Z
+Message: Get single user (id=999) not found test successful - Status: 404
+---
+Test Case: ReqRes_CreateUser
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:18.977721Z
+Message: Create user successful - Status: 201
+---
+Test Case: ReqRes_UpdateUser_PUT
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:19.275760Z
+Message: Update user (PUT) successful - Status: 200
+---
+Test Case: ReqRes_PatchUser
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:20.372354Z
+Message: Patch user successful - Status: 200
+---
+Test Case: ReqRes_DeleteUser
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:20.498313Z
+Message: Delete user successful - Status: 200
+---
+Test Case: ReqRes_Register_Valid
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:20.658938Z
+Message: Register with valid details successful - Status: 200
+---
+Test Case: ReqRes_Register_MissingPassword
+Type: API
+Status: FAILED
+Executed At: 2025-09-17T12:24:20.809650Z
+Message: Register with missing password test failed: Read timed out
+---
+Test Case: ReqRes_Login_Valid
+Type: API
+Status: PASSED
+Executed At: 2025-09-17T12:24:20.877651Z
+Message: Login with valid credentials successful - Status: 200
+---

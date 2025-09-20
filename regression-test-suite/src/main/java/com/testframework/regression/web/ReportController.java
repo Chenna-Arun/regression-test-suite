@@ -1,6 +1,11 @@
 package com.testframework.regression.web;
 
 import com.testframework.regression.service.ReportService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +45,44 @@ public class ReportController {
             response.setMessage("Report generation failed: " + e.getMessage());
             return ResponseEntity.ok(response);
         }
+    }
+
+    @GetMapping("/{executionId}/download")
+    public ResponseEntity<FileSystemResource> downloadReport(@PathVariable String executionId,
+                                                             @RequestParam(name = "type", defaultValue = "html") String type) {
+        String path;
+        if ("csv".equalsIgnoreCase(type)) {
+            path = reportService.generateCSVReport(executionId);
+        } else if ("junit".equalsIgnoreCase(type)) {
+            path = reportService.generateJUnitReport(executionId);
+        } else {
+            path = reportService.generateHTMLReport(executionId);
+        }
+        FileSystemResource resource = new FileSystemResource(path);
+        String filename = resource.getFilename();
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if ("csv".equalsIgnoreCase(type)) mediaType = MediaType.TEXT_PLAIN;
+        else if ("html".equalsIgnoreCase(type)) mediaType = MediaType.TEXT_HTML;
+        else if ("junit".equalsIgnoreCase(type)) mediaType = MediaType.APPLICATION_XML;
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(mediaType)
+                .body(resource);
+    }
+
+    @GetMapping("/artifacts/{executionId}/{testCaseId}/{file}")
+    public ResponseEntity<FileSystemResource> downloadArtifact(@PathVariable String executionId,
+                                                               @PathVariable Long testCaseId,
+                                                               @PathVariable String file) {
+        String path = "artifacts/" + executionId + "/" + testCaseId + "/" + file;
+        FileSystemResource resource = new FileSystemResource(path);
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @PostMapping("/collect")

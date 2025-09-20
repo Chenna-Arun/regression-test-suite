@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="RegressionSuite" tests="20" failures="10" time="26">
+  <testcase classname="UI" name="BlazeDemo_HomePage_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Dropdown_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_Boston_London">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_NewYork_Paris">
+    <failure message="Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: &apos;4.27.0&apos;, revision: &apos;d6e718d134&apos;
+System info: os.name: &apos;Windows 10&apos;, os.arch: &apos;amd64&apos;, os.version: &apos;10.0&apos;, java.version: &apos;24.0.2&apos;
+Driver info: driver.version: unknown | Screenshot: artifacts\testng_combined_1758108153698\9\FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250917_165253.png"/>
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_ChooseFirstFlight">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_PriceConsistency">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_CompleteBooking_Valid">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_EmptyFields">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_InvalidCard">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_EndToEnd_Flow">
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetUsers_Page2">
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetSingleUser_Valid">
+    <failure message="Get single user (id=2) failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetSingleUser_NotFound">
+    <failure message="Get single user (id=23) not found test failed - Expected 404, got: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_CreateUser">
+    <failure message="Create user failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_UpdateUser_PUT">
+    <failure message="Update user (PUT) failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_PatchUser">
+    <failure message="Patch user failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_DeleteUser">
+    <failure message="Delete user failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_Register_Valid">
+    <failure message="Register with valid details failed - Status: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_Register_MissingPassword">
+    <failure message="Register with missing password test failed - Expected 400, got: 401"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_Login_Valid">
+    <failure message="Login with valid credentials failed - Status: 401"/>
+  </testcase>
+</testsuite>

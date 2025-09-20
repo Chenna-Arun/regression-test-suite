@@ -1,6 +1,7 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="EmptySuite" verbose="1" parallel="none">
-    <test name="EmptyTest" />
+<suite name="Combined-TestSuite" parallel="tests" thread-count="8">
+    <test name="UI-Tests" />
+    <test name="API-Tests" />
 </suite>
 
 

@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_GetSingleUser_Valid",
+  "method": "GET",
+  "url": "https://jsonplaceholder.typicode.com/users/2",
+  "body": null
+}

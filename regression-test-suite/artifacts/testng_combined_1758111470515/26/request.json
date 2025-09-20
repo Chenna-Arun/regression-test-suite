@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_GetUsers_Page2",
+  "method": "GET",
+  "url": "https://jsonplaceholder.typicode.com/users",
+  "body": null
+}

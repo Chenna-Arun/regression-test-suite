@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_Login_Valid",
+  "method": "POST",
+  "url": "https://httpbin.org/post",
+  "body": {"email":"eve.holt@example.com","password":"pistol"}
+}

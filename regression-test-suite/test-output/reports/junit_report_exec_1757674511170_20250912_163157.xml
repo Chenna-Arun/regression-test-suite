@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="RegressionSuite" tests="10" failures="1">
+  <testcase classname="UI" name="BlazeDemo_HomePage_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Dropdown_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_Boston_London">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_NewYork_Paris">
+    <failure message="Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: &apos;4.26.0&apos;, revision: &apos;8ccf0219d7&apos;
+System info: os.name: &apos;Windows 10&apos;, os.arch: &apos;amd64&apos;, os.version: &apos;10.0&apos;, java.version: &apos;24.0.2&apos;
+Driver info: driver.version: unknown"/>
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_ChooseFirstFlight">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_PriceConsistency">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_CompleteBooking_Valid">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_EmptyFields">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_InvalidCard">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_EndToEnd_Flow">
+  </testcase>
+</testsuite>

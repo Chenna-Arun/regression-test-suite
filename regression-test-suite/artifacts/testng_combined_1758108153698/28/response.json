@@ -1,0 +1,3 @@
+{
+  "message": "Get single user (id=23) not found test failed - Expected 404, got: 401"
+}

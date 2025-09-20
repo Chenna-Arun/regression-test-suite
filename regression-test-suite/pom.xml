@@ -16,7 +16,7 @@
 
 	<properties>
 		<java.version>21</java.version>
-		<selenium.version>4.26.0</selenium.version>
+		<selenium.version>4.27.0</selenium.version>
 		<testng.version>7.10.2</testng.version>
 		<rest-assured.version>5.5.0</rest-assured.version>
 		<extent-reports.version>5.1.2</extent-reports.version>
@@ -28,6 +28,8 @@
 		<poi.version>5.3.0</poi.version>
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
+		<!-- Temporarily skip JaCoCo agent to avoid Java 21+ classfile instrumentation errors -->
+		<jacoco.skip>true</jacoco.skip>
 	</properties>
 
 	<dependencies>
@@ -83,7 +85,7 @@
 			<artifactId>selenium-java</artifactId>
 			<version>${selenium.version}</version>
 		</dependency>
-		<dependency>
+			<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-chrome-driver</artifactId>
 			<version>${selenium.version}</version>
@@ -330,9 +332,11 @@
 					<excludes>
 						<exclude>**/*IntegrationTest.java</exclude>
 					</excludes>
-					<suiteXmlFiles>
-						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-					</suiteXmlFiles>
+					<!-- Allow overriding suite file via -Dsurefire.suiteXmlFiles; default to testng.xml -->
+					<suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+					<systemPropertyVariables>
+						<surefire.suiteXmlFiles>src/test/resources/testng.xml</surefire.suiteXmlFiles>
+					</systemPropertyVariables>
 					<testFailureIgnore>false</testFailureIgnore>
 				</configuration>
 				<dependencies>

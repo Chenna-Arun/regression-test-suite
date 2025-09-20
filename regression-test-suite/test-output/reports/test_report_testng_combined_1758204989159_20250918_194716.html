@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test Execution Report</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+.passed { background-color: #d4edda; }
+.failed { background-color: #f8d7da; }
+.summary { background-color: #e2e3e5; padding: 15px; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class='summary'>
+<h2>Test Execution Summary</h2>
+<p><strong>Execution ID:</strong> testng_combined_1758204989159</p>
+<p><strong>Duration:</strong> 22s</p>
+<p><strong>Total Tests:</strong> 20</p>
+<p><strong>Passed:</strong> 19</p>
+<p><strong>Failed:</strong> 1</p>
+<p><strong>Pass Rate:</strong> 95.00%</p>
+<p><strong>Generated:</strong> 2025-09-18 19:47:16</p>
+</div>
+<h2>Test Results</h2>
+<table>
+<tr><th>Test Case ID</th><th>Test Case Name</th><th>Type</th><th>Status</th><th>Executed At</th><th>Artifacts</th><th>Message</th></tr>
+<tr class='passed'>
+<td>6</td>
+<td>BlazeDemo_HomePage_Test</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:50.010348Z</td>
+<td></td>
+<td>BlazeDemo home page loaded successfully - Title: BlazeDemo</td>
+</tr>
+<tr class='passed'>
+<td>7</td>
+<td>BlazeDemo_Dropdown_Test</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:50.676349Z</td>
+<td></td>
+<td>Dropdown test passed - Departure options: 7, Destination options: 7</td>
+</tr>
+<tr class='passed'>
+<td>8</td>
+<td>BlazeDemo_FlightSearch_Boston_London</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:49.248349Z</td>
+<td></td>
+<td>Flight search successful from Boston to London</td>
+</tr>
+<tr class='failed'>
+<td>9</td>
+<td>BlazeDemo_FlightSearch_NewYork_Paris</td>
+<td>UI</td>
+<td>FAILED</td>
+<td>2025-09-18T14:16:48.279348Z</td>
+<td><a href='../../../artifacts/unknown/9/FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250918_194656.png' target='_blank'>screenshot</a></td>
+<td>Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.27.0', revision: 'd6e718d134'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '24.0.2'
+Driver info: driver.version: unknown | Screenshot: artifacts\unknown\9\FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250918_194656.png</td>
+</tr>
+<tr class='passed'>
+<td>10</td>
+<td>BlazeDemo_ChooseFirstFlight</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:54.232347Z</td>
+<td></td>
+<td>Flight selection successful</td>
+</tr>
+<tr class='passed'>
+<td>11</td>
+<td>BlazeDemo_PriceConsistency</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:48.497348Z</td>
+<td></td>
+<td>Price consistency check completed</td>
+</tr>
+<tr class='passed'>
+<td>12</td>
+<td>BlazeDemo_CompleteBooking_Valid</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:48.262348Z</td>
+<td></td>
+<td>Valid booking completed successfully</td>
+</tr>
+<tr class='passed'>
+<td>13</td>
+<td>BlazeDemo_Booking_EmptyFields</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:16:52.216346Z</td>
+<td></td>
+<td>Empty fields validation test completed</td>
+</tr>
+<tr class='passed'>
+<td>14</td>
+<td>BlazeDemo_Booking_InvalidCard</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:07.148346Z</td>
+<td></td>
+<td>Invalid card test completed</td>
+</tr>
+<tr class='passed'>
+<td>15</td>
+<td>BlazeDemo_EndToEnd_Flow</td>
+<td>UI</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:06.984346Z</td>
+<td></td>
+<td>End-to-end flow completed successfully - Thank you for your purchase today!</td>
+</tr>
+<tr class='passed'>
+<td>26</td>
+<td>ReqRes_GetUsers_Page2</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:04.849348Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/26/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/26/response.json' target='_blank'>response</a></td>
+<td>Get users page 2 successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>27</td>
+<td>ReqRes_GetSingleUser_Valid</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:07.666346Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/27/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/27/response.json' target='_blank'>response</a></td>
+<td>Get single user (id=2) successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>28</td>
+<td>ReqRes_GetSingleUser_NotFound</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:09.651345Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/28/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/28/response.json' target='_blank'>response</a></td>
+<td>Get single user (id=999) not found test successful - Status: 404</td>
+</tr>
+<tr class='passed'>
+<td>29</td>
+<td>ReqRes_CreateUser</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:09.693346Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/29/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/29/response.json' target='_blank'>response</a></td>
+<td>Create user successful - Status: 201</td>
+</tr>
+<tr class='passed'>
+<td>30</td>
+<td>ReqRes_UpdateUser_PUT</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.124347Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/30/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/30/response.json' target='_blank'>response</a></td>
+<td>Update user (PUT) successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>31</td>
+<td>ReqRes_PatchUser</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.329346Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/31/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/31/response.json' target='_blank'>response</a></td>
+<td>Patch user successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>32</td>
+<td>ReqRes_DeleteUser</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.635345Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/32/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/32/response.json' target='_blank'>response</a></td>
+<td>Delete user successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>33</td>
+<td>ReqRes_Register_Valid</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.679346Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/33/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/33/response.json' target='_blank'>response</a></td>
+<td>Register with valid details successful - Status: 200</td>
+</tr>
+<tr class='passed'>
+<td>34</td>
+<td>ReqRes_Register_MissingPassword</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.699362Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/34/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/34/response.json' target='_blank'>response</a></td>
+<td>Register with missing password test successful - Status: 400</td>
+</tr>
+<tr class='passed'>
+<td>35</td>
+<td>ReqRes_Login_Valid</td>
+<td>API</td>
+<td>PASSED</td>
+<td>2025-09-18T14:17:10.789345Z</td>
+<td><a href='../../../artifacts/testng_combined_1758204989159/35/request.json' target='_blank'>request</a> | <a href='../../../artifacts/testng_combined_1758204989159/35/response.json' target='_blank'>response</a></td>
+<td>Login with valid credentials successful - Status: 200</td>
+</tr>
+</table>
+</body>
+</html>

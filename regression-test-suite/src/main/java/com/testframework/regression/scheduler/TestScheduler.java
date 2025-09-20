@@ -1,32 +1,34 @@
 package com.testframework.regression.scheduler;
 
-import com.testframework.regression.domain.TestCase;
+import com.testframework.regression.engine.SuiteRegistry;
 import com.testframework.regression.engine.TestIntegrationEngine;
-import com.testframework.regression.service.TestCaseService;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @EnableScheduling
 public class TestScheduler {
 
-    private final TestCaseService testCaseService;
     private final TestIntegrationEngine testIntegrationEngine;
+    private final SuiteRegistry suiteRegistry;
 
-    public TestScheduler(TestCaseService testCaseService, TestIntegrationEngine testIntegrationEngine) {
-        this.testCaseService = testCaseService;
+    public TestScheduler(TestIntegrationEngine testIntegrationEngine, SuiteRegistry suiteRegistry) {
         this.testIntegrationEngine = testIntegrationEngine;
+        this.suiteRegistry = suiteRegistry;
     }
 
-    // Every Saturday at 22:00 local time
-    @Scheduled(cron = "0 0 22 * * SAT")
-    public void runWeeklyRegression() {
-        List<TestCase> all = testCaseService.findAll();
-        List<Long> testCaseIds = all.stream().map(TestCase::getId).toList();
-        testIntegrationEngine.executeParallel(testCaseIds);
+    // Default daily schedule at 03:00 AM local time - run combined (UI + API)
+    @Scheduled(cron = "0 0 3 * * *")
+    public void runDailyCombinedSuite() {
+        List<Long> uiIds = suiteRegistry.resolveSuiteToTestCaseIds("BLAZE_SMOKE").orElse(List.of());
+        List<Long> apiIds = suiteRegistry.resolveSuiteToTestCaseIds("REQRES_SMOKE").orElse(List.of());
+        List<Long> combined = new ArrayList<>(uiIds);
+        combined.addAll(apiIds);
+        testIntegrationEngine.executeParallel(combined);
     }
 }
 

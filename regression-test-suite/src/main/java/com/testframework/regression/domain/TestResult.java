@@ -30,6 +30,15 @@ public class TestResult {
     @Column(name = "execution_id", length = 100)
     private String executionId;
 
+    @Column(name = "screenshot_path", length = 500)
+    private String screenshotPath;
+
+    @Column(name = "api_request_path", length = 500)
+    private String apiRequestPath;
+
+    @Column(name = "api_response_path", length = 500)
+    private String apiResponsePath;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -47,6 +56,15 @@ public class TestResult {
 
     public String getExecutionId() { return executionId; }
     public void setExecutionId(String executionId) { this.executionId = executionId; }
+
+    public String getScreenshotPath() { return screenshotPath; }
+    public void setScreenshotPath(String screenshotPath) { this.screenshotPath = screenshotPath; }
+
+    public String getApiRequestPath() { return apiRequestPath; }
+    public void setApiRequestPath(String apiRequestPath) { this.apiRequestPath = apiRequestPath; }
+
+    public String getApiResponsePath() { return apiResponsePath; }
+    public void setApiResponsePath(String apiResponsePath) { this.apiResponsePath = apiResponsePath; }
 }
 
 

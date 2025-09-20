@@ -22,4 +22,10 @@ Steps:
 
 That’s it. The framework will run the 20 tests. Reports will be saved under `test-output/reports/`.
 
+## Running the Combined Suite (UI + API Tests)(CURRENT COMMAND TO RUN THE PROJECT)
 
+To execute the **Combined Suite** (which includes both UI and API test cases), use the following command:
+
+```bash
+.\mvnw.cmd clean test "-Dtest=tests.combined.CombinedSuiteRunner"
+```

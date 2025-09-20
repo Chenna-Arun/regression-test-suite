@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_PatchUser",
+  "method": "PATCH",
+  "url": "https://jsonplaceholder.typicode.com/users/2",
+  "body": {"name":"John Doe Patched"}
+}

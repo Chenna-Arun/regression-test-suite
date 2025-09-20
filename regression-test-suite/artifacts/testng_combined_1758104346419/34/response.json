@@ -1,0 +1,3 @@
+{
+  "message": "Register with missing password test failed - Expected 400, got: 401"
+}

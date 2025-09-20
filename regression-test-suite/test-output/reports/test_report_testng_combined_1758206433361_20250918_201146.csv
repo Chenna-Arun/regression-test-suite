@@ -1,0 +1,25 @@
+Test Case ID,Test Case Name,Type,Status,Executed At,Duration(s),Artifact(s),Message
+6,"BlazeDemo_HomePage_Test",UI,PASSED,2025-09-18T14:40:50.827158Z,0,"","BlazeDemo home page loaded successfully - Title: BlazeDemo"
+7,"BlazeDemo_Dropdown_Test",UI,PASSED,2025-09-18T14:40:50.044482Z,0,"","Dropdown test passed - Departure options: 7, Destination options: 7"
+8,"BlazeDemo_FlightSearch_Boston_London",UI,PASSED,2025-09-18T14:40:50.041481Z,0,"","Flight search successful from Boston to London"
+9,"BlazeDemo_FlightSearch_NewYork_Paris",UI,FAILED,2025-09-18T14:40:50.852159Z,0,"FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250918_201110.png","Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.27.0', revision: 'd6e718d134'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '24.0.2'
+Driver info: driver.version: unknown | Screenshot: artifacts\unknown\9\FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250918_201110.png"
+10,"BlazeDemo_ChooseFirstFlight",UI,PASSED,2025-09-18T14:40:50.535177Z,0,"","Flight selection successful"
+11,"BlazeDemo_PriceConsistency",UI,PASSED,2025-09-18T14:40:50.643158Z,0,"","Price consistency check completed"
+12,"BlazeDemo_CompleteBooking_Valid",UI,PASSED,2025-09-18T14:40:50.882160Z,0,"","Valid booking completed successfully"
+13,"BlazeDemo_Booking_EmptyFields",UI,PASSED,2025-09-18T14:40:51.107157Z,0,"","Empty fields validation test completed"
+14,"BlazeDemo_Booking_InvalidCard",UI,PASSED,2025-09-18T14:41:11.411493Z,0,"","Invalid card test completed"
+15,"BlazeDemo_EndToEnd_Flow",UI,PASSED,2025-09-18T14:41:12.864662Z,0,"","End-to-end flow completed successfully - Thank you for your purchase today!"
+26,"ReqRes_GetUsers_Page2",API,PASSED,2025-09-18T14:41:14.567642Z,0,"","Get users page 2 successful - Status: 200"
+27,"ReqRes_GetSingleUser_Valid",API,PASSED,2025-09-18T14:41:20.765874Z,0,"","Get single user (id=2) successful - Status: 200"
+28,"ReqRes_GetSingleUser_NotFound",API,PASSED,2025-09-18T14:41:21.030878Z,0,"","Get single user (id=999) not found test successful - Status: 404"
+29,"ReqRes_CreateUser",API,PASSED,2025-09-18T14:41:21.320881Z,0,"","Create user successful - Status: 201"
+30,"ReqRes_UpdateUser_PUT",API,PASSED,2025-09-18T14:41:22.668874Z,0,"","Update user (PUT) successful - Status: 200"
+31,"ReqRes_PatchUser",API,PASSED,2025-09-18T14:41:23.814968Z,0,"","Patch user successful - Status: 200"
+32,"ReqRes_DeleteUser",API,PASSED,2025-09-18T14:41:24.362662Z,0,"","Delete user successful - Status: 200"
+33,"ReqRes_Register_Valid",API,FAILED,2025-09-18T14:41:24.896661Z,0,"","Register with valid details failed: Read timed out"
+34,"ReqRes_Register_MissingPassword",API,FAILED,2025-09-18T14:41:29.661255Z,0,"","Register with missing password test failed: Read timed out"
+35,"ReqRes_Login_Valid",API,FAILED,2025-09-18T14:41:29.690256Z,0,"","Login with valid credentials failed: Read timed out"

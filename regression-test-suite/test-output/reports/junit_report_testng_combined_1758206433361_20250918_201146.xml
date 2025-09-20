@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="RegressionSuite" tests="20" failures="4" time="39">
+  <testcase classname="UI" name="BlazeDemo_HomePage_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Dropdown_Test">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_Boston_London">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_FlightSearch_NewYork_Paris">
+    <failure message="Flight search failed: Cannot locate option with text: New York
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: &apos;4.27.0&apos;, revision: &apos;d6e718d134&apos;
+System info: os.name: &apos;Windows 10&apos;, os.arch: &apos;amd64&apos;, os.version: &apos;10.0&apos;, java.version: &apos;24.0.2&apos;
+Driver info: driver.version: unknown | Screenshot: artifacts\unknown\9\FAILED_BlazeDemo_FlightSearch_NewYork_Paris_20250918_201110.png"/>
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_ChooseFirstFlight">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_PriceConsistency">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_CompleteBooking_Valid">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_EmptyFields">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_Booking_InvalidCard">
+  </testcase>
+  <testcase classname="UI" name="BlazeDemo_EndToEnd_Flow">
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetUsers_Page2">
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetSingleUser_Valid">
+  </testcase>
+  <testcase classname="API" name="ReqRes_GetSingleUser_NotFound">
+  </testcase>
+  <testcase classname="API" name="ReqRes_CreateUser">
+  </testcase>
+  <testcase classname="API" name="ReqRes_UpdateUser_PUT">
+  </testcase>
+  <testcase classname="API" name="ReqRes_PatchUser">
+  </testcase>
+  <testcase classname="API" name="ReqRes_DeleteUser">
+  </testcase>
+  <testcase classname="API" name="ReqRes_Register_Valid">
+    <failure message="Register with valid details failed: Read timed out"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_Register_MissingPassword">
+    <failure message="Register with missing password test failed: Read timed out"/>
+  </testcase>
+  <testcase classname="API" name="ReqRes_Login_Valid">
+    <failure message="Login with valid credentials failed: Read timed out"/>
+  </testcase>
+</testsuite>

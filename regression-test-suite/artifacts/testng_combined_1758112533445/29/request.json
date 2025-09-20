@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_CreateUser",
+  "method": "POST",
+  "url": "https://jsonplaceholder.typicode.com/users",
+  "body": {"name":"John Doe","email":"john@example.com"}
+}

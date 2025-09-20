@@ -1,0 +1,6 @@
+{
+  "test": "ReqRes_UpdateUser_PUT",
+  "method": "PUT",
+  "url": "https://jsonplaceholder.typicode.com/users/2",
+  "body": {"name":"John Doe Updated","email":"john.updated@example.com"}
+}

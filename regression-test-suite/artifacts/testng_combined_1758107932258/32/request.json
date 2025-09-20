@@ -1,0 +1,4 @@
+{
+  "test": "ReqRes_DeleteUser",
+  "url": "https://reqres.in/api"
+}
