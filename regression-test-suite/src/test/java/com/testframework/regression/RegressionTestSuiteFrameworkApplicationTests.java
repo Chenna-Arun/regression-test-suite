@@ -9,5 +9,6 @@ class RegressionTestSuiteFrameworkApplicationTests {
 	@Test
 	void contextLoads() {
 
+	}
 
 }
