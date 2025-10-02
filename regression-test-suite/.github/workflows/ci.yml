@@ -12,6 +12,9 @@ permissions:
 jobs:
   build-and-test:
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: regression-test-suite
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,17 +26,16 @@ jobs:
           cache: maven
       - name: Run Regression Tests (Maven wrapper on Windows)
         shell: cmd
-        working-directory: regression-test-suite
         run: >-
           .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
           -Dmaven.test.failure.ignore=true
-      - name: Upload test reports (html, csv, xml, logs)
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports
           path: |
-            regression-test-suite/test-output/reports/**
+            target/surefire-reports/**  # <-- Standard Maven reports
           retention-days: 30
       - name: Upload screenshots & artifacts
         if: always()
@@ -41,12 +43,12 @@ jobs:
         with:
           name: regression-test-screenshots
           path: |
-            regression-test-suite/artifacts/**
+            artifacts/**  # <-- Adjust if your artifacts folder is different
           retention-days: 30
-      - name: Publish test results to GitHub (test summary & annotations)
+      - name: Publish test results to GitHub
         if: always()
         uses: dorny/test-reporter@v2
         with:
           name: Regression Suite
-          path: regression-test-suite/test-output/reports/**/*.xml
+          path: target/surefire-reports/**/*.xml
           reporter: junit
