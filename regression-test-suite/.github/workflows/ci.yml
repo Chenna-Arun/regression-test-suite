@@ -1,0 +1,52 @@
+---
+name: Automation Regression Testing CI
+'on':
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 21 (Temurin) and enable Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Run Regression Tests (Maven wrapper on Windows)
+        shell: cmd
+        working-directory: regression-test-suite
+        run: >-
+          .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
+          -Dmaven.test.failure.ignore=true
+      - name: Upload test reports (html, csv, xml, logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-reports
+          path: |
+            regression-test-suite/test-output/reports/**
+          retention-days: 30
+      - name: Upload screenshots & artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-screenshots
+          path: |
+            regression-test-suite/artifacts/**
+          retention-days: 30
+      - name: Publish test results to GitHub (test summary & annotations)
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Regression Suite
+          path: regression-test-suite/test-output/reports/**/*.xml
+          reporter: junit
