@@ -12,6 +12,19 @@ permissions:
 jobs:
   build-and-test:
     runs-on: windows-latest
+    services:
+      mysql:
+        image: mysql:8
+        ports:
+          - '3306:3306'
+        env:
+          MYSQL_DATABASE: automation_testing
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root@123
+          MYSQL_ROOT_PASSWORD: root@123
+        options: >-
+          --health-cmd="mysqladmin ping --silent" --health-interval=10s
+          --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,6 +34,12 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            mysqladmin ping -h 127.0.0.1 -u root -proot@123 && break
+            sleep 2
+          done
       - name: Run Regression Tests (Maven wrapper on Windows)
         shell: cmd
         working-directory: regression-test-suite
