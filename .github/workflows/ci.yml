@@ -1,4 +1,3 @@
----
 name: Automation Regression Testing CI
 'on':
   push:
@@ -9,6 +8,7 @@ permissions:
   contents: read
   actions: read
   checks: write
+
 jobs:
   build-and-test:
     runs-on: windows-latest
@@ -16,36 +16,42 @@ jobs:
       mysql:
         image: mysql:8
         ports:
-          - '3306:3306'
+          - 3306:3306
         env:
           MYSQL_DATABASE: automation_testing
           MYSQL_USER: root
           MYSQL_PASSWORD: root@123
           MYSQL_ROOT_PASSWORD: root@123
         options: >-
-          --health-cmd="mysqladmin ping --silent" --health-interval=10s
-          --health-timeout=5s --health-retries=5
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up JDK 21 (Temurin) and enable Maven cache
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
+
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
             mysqladmin ping -h 127.0.0.1 -u root -proot@123 && break
             sleep 2
           done
+
       - name: Run Regression Tests (Maven wrapper on Windows)
         shell: cmd
         working-directory: regression-test-suite
         run: >-
           .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
           -Dmaven.test.failure.ignore=true
+
       - name: Upload test reports (HTML + XML + logs)
         if: always()
         uses: actions/upload-artifact@v4
@@ -55,6 +61,7 @@ jobs:
             regression-test-suite/test-output/reports/**
             regression-test-suite/target/surefire-reports/**
           retention-days: 30
+
       - name: Upload screenshots & artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -62,6 +69,7 @@ jobs:
           name: regression-test-screenshots
           path: regression-test-suite/artifacts/**
           retention-days: 30
+
       - name: Publish JUnit test results to GitHub (summary + annotations)
         if: always()
         uses: dorny/test-reporter@v2
