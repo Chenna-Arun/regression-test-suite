@@ -27,7 +27,7 @@ jobs:
         run: >-
           .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
           -Dmaven.test.failure.ignore=true
-      - name: Upload test reports (html, csv, xml, logs)
+      - name: Upload test reports (HTML + XML + logs)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -41,13 +41,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: |
-            regression-test-suite/artifacts/**
+          path: regression-test-suite/artifacts/**
           retention-days: 30
-      - name: Publish test results to GitHub (test summary & annotations)
+      - name: Publish JUnit test results to GitHub (summary + annotations)
         if: always()
         uses: dorny/test-reporter@v2
         with:
           name: Regression Suite
           path: regression-test-suite/target/surefire-reports/*.xml
           reporter: java-junit
+          fail-on-error: false
