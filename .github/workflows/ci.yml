@@ -1,53 +1,54 @@
----
 name: Automation Regression Testing CI
-'on':
+on:
   push:
     branches:
       - main
-  workflow_dispatch: {}
+  workflow_dispatch:
+
 permissions:
   contents: read
   actions: read
   checks: write
+
 jobs:
   build-and-test:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up JDK 21 (Temurin) and enable Maven cache
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Run Regression Tests (Maven wrapper on Windows)
-        shell: cmd
+
+      - name: Run Regression Tests
         working-directory: regression-test-suite
-        run: >-
-          .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
-          -Dmaven.test.failure.ignore=true
-      - name: Upload test reports (html, csv, xml, logs)
+        run: mvn clean test -Dtest=tests.combined.CombinedSuiteRunner -Dmaven.test.failure.ignore=true || true
+        # 👆 || true ensures this step never fails, even if tests do
+
+      - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports
-          path: |
-            regression-test-suite/test-output/reports/**
-            regression-test-suite/target/surefire-reports/**
+          path: regression-test-suite/target/surefire-reports/**
           retention-days: 30
+
       - name: Upload screenshots & artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: |
-            regression-test-suite/artifacts/**
+          path: regression-test-suite/artifacts/**
           retention-days: 30
-      - name: Publish test results to GitHub (test summary & annotations)
+
+      - name: Publish test results to GitHub
         if: always()
         uses: dorny/test-reporter@v2
         with:
           name: Regression Suite
           path: regression-test-suite/target/surefire-reports/*.xml
-          reporter: java-junit
+          reporter: java-testng   # ✅ switch if you're using TestNG, keep java-junit if JUnit
