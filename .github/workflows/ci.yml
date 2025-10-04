@@ -1,4 +1,4 @@
-name: CI - Spring Boot + TestNG + Selenium
+name: CI - Selenium TestNG Suite
 
 on:
   push:
@@ -12,41 +12,51 @@ jobs:
   build-and-test:
     runs-on: windows-latest
 
-    steps:
-      # 1. Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    env:
+      MAVEN_OPTS: "-Xmx1024m"
 
-      # 2. Set up JDK (17)
-      - name: Set up JDK
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: 21
 
-      # 3. Cache Maven dependencies
+      # Step 3: Set up Chrome for Selenium
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v2
+
+      # Step 4: Cache Maven dependencies
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: |
+            ~/.m2/repository
+            !~/.m2/repository/org/apache/maven/plugins/maven-surefire-plugin
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4. Install dependencies (skip tests)
-      - name: Install dependencies
+      # Step 5: Build the project (skip tests)
+      - name: Build project
         run: .\mvnw.cmd clean install -DskipTests
+        shell: cmd
 
-      # 5. Run CombinedSuiteRunner tests
-      - name: Run CombinedSuiteRunner
-        run: |
-          echo "Running CombinedSuiteRunner in headless mode"
-          setx BROWSER_HEADLESS true
-          .\mvnw.cmd clean test "-Dtest=tests.combined.CombinedSuiteRunner"
+      # Step 6: Run CombinedSuiteRunner (TestNG)
+      - name: Run Combined Suite
+        run: .\mvnw.cmd test "-Dtest=tests.combined.CombinedSuiteRunner"
+        shell: cmd
 
-      # 6. Archive TestNG reports
-      - name: Archive test results
+      # Step 7: Upload Test Reports
+      - name: Upload TestNG Reports
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: target/surefire-reports/
+          name: testng-reports
+          path: |
+            target/surefire-reports/
+            target/test-output/
