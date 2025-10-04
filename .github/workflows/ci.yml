@@ -1,4 +1,4 @@
-name: CI - CombinedSuiteRunner
+name: Regression Test Suite CI
 
 on:
   push:
@@ -12,33 +12,42 @@ jobs:
   build-and-test:
     runs-on: windows-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    env:
+      MAVEN_OPTS: "-Xmx1024m"
 
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Java 21
       - name: Set up Java 21
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
           java-version: 21
-          cache: maven
+          distribution: temurin
 
-      - name: Set up Chrome
+      # Install Chrome (required for Selenium)
+      - name: Install Chrome
         uses: browser-actions/setup-chrome@v2
         with:
           chrome-version: latest
 
+      # Build Maven project (skip tests)
       - name: Build project
         run: mvn clean install -DskipTests
-        shell: cmd
         working-directory: regression-test-suite/regression-test-suite
 
-      - name: Run CombinedSuiteRunner
-        run: mvn test -Dtest=tests.combined.CombinedSuiteRunner
-        shell: cmd
+      # Run TestNG combined suite in headless mode
+      - name: Run CombinedSuiteRunner tests
+        run: mvn test "-Dtest=tests.combined.CombinedSuiteRunner"
         working-directory: regression-test-suite/regression-test-suite
+        env:
+          # Force headless mode for Selenium
+          HEADLESS: true
 
-      - name: Upload Test Reports
+      # Upload TestNG/Surefire reports
+      - name: Upload TestNG Reports
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
