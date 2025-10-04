@@ -52,6 +52,11 @@ jobs:
       - name: Wait for MySQL to be ready
         run: sleep 15
 
+      # Make Maven wrapper executable
+      - name: Make Maven wrapper executable
+        run: chmod +x ./mvnw
+        working-directory: regression-test-suite
+
       # Run Regression Tests (TestNG)
       - name: Run Regression Tests
         working-directory: regression-test-suite
