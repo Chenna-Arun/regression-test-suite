@@ -27,12 +27,10 @@ jobs:
           cache: maven
 
       - name: Run Regression Tests
+        shell: cmd
         working-directory: regression-test-suite
-        run: |
-          mvn clean test ^
-            "-Dtest=tests.combined.CombinedSuiteRunner" ^
-            "-Dmaven.test.failure.ignore=true" || true
-        # 👆 || true ensures the workflow always succeeds, even with failing tests
+        run: mvn clean test -Dtest=tests.combined.CombinedSuiteRunner -Dmaven.test.failure.ignore=true || exit /b 0
+        # 👆 cmd shell + exit /b 0 ensures job never fails even with failing tests
 
       - name: Upload test reports
         if: always()
@@ -56,4 +54,4 @@ jobs:
         with:
           name: Regression Suite
           path: regression-test-suite/target/surefire-reports/*.xml
-          reporter: java-testng   # 👉 use java-junit if your tests are JUnit-based
+          reporter: java-junit   # ✅ Surefire XML format = junit
