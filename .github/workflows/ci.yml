@@ -55,8 +55,8 @@ jobs:
       # Clean previous reports and artifacts
       - name: Clean old reports and artifacts
         run: |
-          rm -rf regression-test-suite/test-output/reports/*
-          rm -rf regression-test-suite/artifacts/*
+          rm -rf regression-test-suite/regression-test-suite/test-output/reports/*
+          rm -rf regression-test-suite/regression-test-suite/artifacts/*
 
       # Make Maven wrapper executable
       - name: Make Maven wrapper executable
@@ -75,8 +75,8 @@ jobs:
         with:
           name: regression-test-reports
           path: |
-            regression-test-suite/test-output/reports/**/*.html
-            regression-test-suite/test-output/reports/**/*.csv
+            regression-test-suite/regression-test-suite/test-output/reports/**/*.html
+            regression-test-suite/regression-test-suite/test-output/reports/**/*.csv
           retention-days: 30
 
       # Upload only newly generated screenshots & other artifacts
@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: regression-test-suite/artifacts/**/*
+          path: regression-test-suite/regression-test-suite/artifacts/**
           retention-days: 30
