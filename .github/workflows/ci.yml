@@ -51,4 +51,4 @@ jobs:
         with:
           name: Regression Suite
           path: regression-test-suite/target/surefire-reports/*.xml
-          reporter: java-testng   # ✅ switch if you're using TestNG, keep java-junit if JUnit
+          reporter: java-junit   # ✅ switch if you're using TestNG, keep java-junit if JUnit
