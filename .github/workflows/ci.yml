@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: regression-test-suite/artifacts/**
+          path: regression-test-suite/artifacts/**/*
           retention-days: 30
