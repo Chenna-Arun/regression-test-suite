@@ -12,7 +12,6 @@ permissions:
   checks: write
 
 env:
-  # Spring Boot datasource configuration for CI
   SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
   SPRING_DATASOURCE_USERNAME: root
   SPRING_DATASOURCE_PASSWORD: root@123
@@ -48,42 +47,68 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Wait a few seconds to ensure MySQL is fully ready
-      - name: Wait for MySQL to be ready
+      # Install Chrome (for Selenium or WebDriver-based tests)
+      - name: Install Chrome for headless tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
+
+      # Verify Chrome installation
+      - name: Verify Chrome installation
+        run: google-chrome --version || chromium-browser --version
+
+      # Wait a few seconds to ensure MySQL is ready
+      - name: Wait for MySQL
         run: sleep 15
 
-      # Clean previous reports and artifacts
-      - name: Clean old reports and artifacts
+      # Ensure artifacts & report folders exist
+      - name: Prepare folders
         run: |
-          rm -rf regression-test-suite/regression-test-suite/test-output/reports/*
-          rm -rf regression-test-suite/regression-test-suite/artifacts/*
+          mkdir -p regression-test-suite/test-output/reports
+          mkdir -p regression-test-suite/artifacts
 
       # Make Maven wrapper executable
       - name: Make Maven wrapper executable
         run: chmod +x ./mvnw
         working-directory: regression-test-suite
 
-      # Run Regression Tests (TestNG)
+      # Run Regression Tests (TestNG) in headless mode
       - name: Run Regression Tests
         working-directory: regression-test-suite
-        run: ./mvnw clean test -Dtest=tests.combined.CombinedSuiteRunner -Dmaven.test.failure.ignore=true
+        env:
+          HEADLESS: true
+        run: |
+          ./mvnw clean test \
+          -Dtest=tests.combined.CombinedSuiteRunner \
+          -Dmaven.test.failure.ignore=true \
+          -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+          -Dselenium.headless=true
 
-      # Upload only newly generated HTML & CSV reports
+      # Debug step: list generated outputs
+      - name: List generated files
+        if: always()
+        run: |
+          echo "=== Reports ==="
+          ls -R regression-test-suite/test-output/reports || echo "No reports found"
+          echo "=== Artifacts ==="
+          ls -R regression-test-suite/artifacts || echo "No artifacts found"
+
+      # Upload HTML & CSV test reports
       - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports
           path: |
-            regression-test-suite/regression-test-suite/test-output/reports/**/*.html
-            regression-test-suite/regression-test-suite/test-output/reports/**/*.csv
+            regression-test-suite/test-output/reports/**/*.html
+            regression-test-suite/test-output/reports/**/*.csv
           retention-days: 30
 
-      # Upload only newly generated screenshots & other artifacts
+      # Upload screenshots & artifacts
       - name: Upload screenshots & artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: regression-test-suite/regression-test-suite/artifacts/**
+          path: regression-test-suite/artifacts/**/*
           retention-days: 30
