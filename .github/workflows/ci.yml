@@ -1,77 +1,52 @@
-name: Automation Regression Testing CI
+name: CI - Spring Boot + TestNG + Selenium
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  actions: read
-  checks: write
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-and-test:
     runs-on: windows-latest
 
     steps:
+      # 1. Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 21 (Temurin) and enable Maven cache
-        uses: actions/setup-java@v4
+      # 2. Set up JDK (17)
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '21'
-          cache: maven
+          java-version: '17'
 
-      # Run tests (cmd shell)
-      - name: Run Regression Tests
-        shell: cmd
-        working-directory: regression-test-suite
-        run: mvn clean test -Dtest=tests.combined.CombinedSuiteRunner -Dspring.main.web-application-type=none -Dspring.profiles.active=ci -Dmaven.test.failure.ignore=true || exit /b 0
-        # -Dspring.main.web-application-type=none prevents Spring from starting embedded web servers (common CI fix)
-        # -Dspring.profiles.active=ci lets you supply CI-specific properties in application-ci.properties
-        # '|| exit /b 0' ensures the step returns success and the job continues to artifact collection
+      # 3. Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-      # List surefire report files (for debugging)
-      - name: List surefire-report files
-        if: always()
-        shell: cmd
-        working-directory: regression-test-suite
-        run: dir target\surefire-reports || exit /b 0
+      # 4. Install dependencies (skip tests)
+      - name: Install dependencies
+        run: .\mvnw.cmd clean install -DskipTests
 
-      # Print TEST-*.xml to logs (first few lines) so you can see the exception in workflow log quickly
-      - name: Show first lines of TEST-*.xml (debug)
-        if: always()
-        shell: cmd
-        working-directory: regression-test-suite
+      # 5. Run CombinedSuiteRunner tests
+      - name: Run CombinedSuiteRunner
         run: |
-          for %F in (target\surefire-reports\TEST-*.xml) do (
-            echo ===== %F =====
-            powershell -Command "Get-Content -Path '%F' -TotalCount 40"
-          ) || exit /b 0
+          echo "Running CombinedSuiteRunner in headless mode"
+          setx BROWSER_HEADLESS true
+          .\mvnw.cmd clean test "-Dtest=tests.combined.CombinedSuiteRunner"
 
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
+      # 6. Archive TestNG reports
+      - name: Archive test results
+        uses: actions/upload-artifact@v3
         with:
-          name: regression-test-reports
-          path: regression-test-suite/target/surefire-reports/**
-          retention-days: 30
-
-      - name: Upload screenshots & artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: regression-test-screenshots
-          path: regression-test-suite/artifacts/**
-          retention-days: 30
-
-      - name: Publish test results to GitHub
-        if: always()
-        uses: dorny/test-reporter@v2
-        with:
-          name: Regression Suite
-          path: regression-test-suite/target/surefire-reports/TEST-*.xml
-          reporter: java-junit
+          name: test-results
+          path: target/surefire-reports/
