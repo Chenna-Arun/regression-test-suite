@@ -2,8 +2,7 @@ name: Automation Regression Testing CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -26,11 +25,32 @@ jobs:
           java-version: '21'
           cache: maven
 
+      # Run tests (cmd shell)
       - name: Run Regression Tests
         shell: cmd
         working-directory: regression-test-suite
-        run: mvn clean test -Dtest=tests.combined.CombinedSuiteRunner -Dmaven.test.failure.ignore=true || exit /b 0
-        # 👆 cmd shell + exit /b 0 ensures job never fails even with failing tests
+        run: mvn clean test -Dtest=tests.combined.CombinedSuiteRunner -Dspring.main.web-application-type=none -Dspring.profiles.active=ci -Dmaven.test.failure.ignore=true || exit /b 0
+        # -Dspring.main.web-application-type=none prevents Spring from starting embedded web servers (common CI fix)
+        # -Dspring.profiles.active=ci lets you supply CI-specific properties in application-ci.properties
+        # '|| exit /b 0' ensures the step returns success and the job continues to artifact collection
+
+      # List surefire report files (for debugging)
+      - name: List surefire-report files
+        if: always()
+        shell: cmd
+        working-directory: regression-test-suite
+        run: dir target\surefire-reports || exit /b 0
+
+      # Print TEST-*.xml to logs (first few lines) so you can see the exception in workflow log quickly
+      - name: Show first lines of TEST-*.xml (debug)
+        if: always()
+        shell: cmd
+        working-directory: regression-test-suite
+        run: |
+          for %F in (target\surefire-reports\TEST-*.xml) do (
+            echo ===== %F =====
+            powershell -Command "Get-Content -Path '%F' -TotalCount 40"
+          ) || exit /b 0
 
       - name: Upload test reports
         if: always()
@@ -53,5 +73,5 @@ jobs:
         uses: dorny/test-reporter@v2
         with:
           name: Regression Suite
-          path: regression-test-suite/target/surefire-reports/*.xml
-          reporter: java-junit   # ✅ Surefire XML format = junit
+          path: regression-test-suite/target/surefire-reports/TEST-*.xml
+          reporter: java-junit
