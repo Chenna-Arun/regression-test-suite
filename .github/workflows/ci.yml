@@ -1,4 +1,4 @@
-name: Automation Regression Testing CI
+name: Regression Testing CI
 
 on:
   push:
@@ -11,25 +11,77 @@ permissions:
   actions: read
   checks: write
 
+env:
+  # Spring Boot datasource configuration for CI
+  SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  SPRING_DATASOURCE_USERNAME: root
+  SPRING_DATASOURCE_PASSWORD: root@123
+
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root@123
+          MYSQL_DATABASE: automation_testing
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up Java and Maven cache
-      - name: Set up JDK 21 (Temurin) and Maven cache
+      # Set up JDK 21 and Maven cache
+      - name: Set up JDK 21 and Maven cache
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
 
-      # Run Regression Tests
-      - name: Run Regression Tests (Maven wrapper)
-        shell: cmd
+      # Wait a few seconds to ensure MySQL is fully ready
+      - name: Wait for MySQL to be ready
+        run: sleep 15
+
+      # Run Regression Tests (TestNG)
+      - name: Run Regression Tests
         working-directory: regression-test-suite
-        run: .\mvnw.cmd clean test -Dtest=tests.combined.CombinedSuiteRunner
+        run: ./mvnw clean test -Dtest=tests.combined.CombinedSuiteRunner -Dmaven.test.failure.ignore=true
+
+      # Upload Surefire / TestNG reports
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-reports
+          path: |
+            regression-test-suite/target/surefire-reports/*.xml
+            regression-test-suite/test-output/reports/**
+          retention-days: 30
+
+      # Upload screenshots / artifacts
+      - name: Upload screenshots & artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-screenshots
+          path: regression-test-suite/artifacts/**
+          retention-days: 30
+
+      # Publish test results to GitHub (TestNG annotations)
+      - name: Publish test results to GitHub
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: Regression Suite
+          path: regression-test-suite/target/surefire-reports/*.xml
+          reporter: java-junit
