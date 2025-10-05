@@ -12,7 +12,7 @@ permissions:
   checks: write
 
 env:
-  SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
   SPRING_DATASOURCE_USERNAME: root
   SPRING_DATASOURCE_PASSWORD: root@123
 
@@ -35,11 +35,9 @@ jobs:
           --health-retries=5
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up JDK 21 and enable Maven cache
       - name: Set up JDK 21 and Maven cache
         uses: actions/setup-java@v4
         with:
@@ -47,73 +45,46 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Install Chrome (for Selenium/WebDriver tests)
-      - name: Install Chrome for headless tests
+      - name: Install Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
           sudo apt-get install -y chromium-chromedriver
 
-      # Verify Chrome installation
-      - name: Verify Chrome installation
-        run: google-chrome --version || chromium-browser --version
-
-      # Wait for MySQL to start
       - name: Wait for MySQL
         run: sleep 15
 
-      # Verify MySQL connection
       - name: Verify MySQL connection
         run: |
           sudo apt-get install -y mysql-client
-          mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
+          mysql -h mysql -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
 
-      # Clean old reports and artifacts to ensure only new ones are saved
-      - name: Clean previous reports & artifacts
-        run: |
-          rm -rf regression-test-suite/test-output/reports || true
-          rm -rf regression-test-suite/artifacts || true
-          mkdir -p regression-test-suite/test-output/reports
-          mkdir -p regression-test-suite/artifacts
-
-      # Make Maven wrapper executable (if exists)
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
         run: chmod +x mvnw || true
 
-      # Run Regression Tests (TestNG)
       - name: Run Regression Tests
         working-directory: regression-test-suite
         env:
           HEADLESS: true
         run: |
           echo "Running TestNG CombinedSuiteRunner..."
-          if [ -f "./mvnw" ]; then
-            ./mvnw clean test \
-              -Dtest=tests.combined.CombinedSuiteRunner \
-              -Dmaven.test.failure.ignore=true \
-              -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-              -Dselenium.headless=true
-          else
-            mvn clean test \
-              -Dtest=tests.combined.CombinedSuiteRunner \
-              -Dmaven.test.failure.ignore=true \
-              -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-              -Dselenium.headless=true
-          fi
+          ./mvnw clean test \
+            -Dtest=tests.combined.CombinedSuiteRunner* \
+            -Dmaven.test.failure.ignore=true \
+            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+            -Dselenium.headless=true
 
-      # Debug listing
+      - name: Show surefire logs
+        if: always()
+        run: cat regression-test-suite/target/surefire-reports/*.txt || echo "No surefire logs found"
+
       - name: List generated files
         if: always()
         run: |
           echo "=== Reports ==="
           ls -R regression-test-suite/test-output/reports || echo "No reports found"
-          echo "=== Artifacts ==="
-          ls -R regression-test-suite/artifacts || echo "No artifacts found"
-          echo "=== Surefire ==="
-          ls -R regression-test-suite/target/surefire-reports || echo "No surefire reports found"
 
-      # Upload HTML & CSV test reports (only new ones)
       - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -122,15 +93,5 @@ jobs:
           path: |
             regression-test-suite/test-output/reports/**/*.html
             regression-test-suite/test-output/reports/**/*.csv
-          retention-days: 30
-          if-no-files-found: ignore
-
-      # Upload screenshots & artifacts (only new ones)
-      - name: Upload screenshots & artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: regression-test-artifacts-${{ github.run_number }}
-          path: regression-test-suite/artifacts/**/*
           retention-days: 30
           if-no-files-found: ignore
