@@ -12,11 +12,9 @@ permissions:
   checks: write
 
 env:
-  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
   SPRING_DATASOURCE_USERNAME: root
   SPRING_DATASOURCE_PASSWORD: root@123
-  SPRING_PROFILES_ACTIVE: test
-  LOGGING_LEVEL_ROOT: DEBUG
 
 jobs:
   build-and-test:
@@ -47,7 +45,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Install Chrome & ChromeDriver
+      - name: Install Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
@@ -57,7 +55,7 @@ jobs:
         run: |
           sudo apt-get install -y mysql-client
           for i in {1..30}; do
-            if mysql -h mysql -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
+            if mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
               echo "MySQL is ready"
               break
             fi
@@ -65,37 +63,35 @@ jobs:
             sleep 2
           done
 
-      - name: Verify MySQL connection
+      - name: Clean old reports
         run: |
-          mysql -h mysql -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
+          rm -rf regression-test-suite/test-output/reports/*
+          rm -rf regression-test-suite/artifacts/*
 
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
-        run: chmod +x mvnw || true
+        run: chmod +x ./mvnw
 
       - name: Run Regression Tests
         working-directory: regression-test-suite
         env:
           HEADLESS: true
         run: |
-          echo "Running TestNG CombinedSuiteRunner..."
           ./mvnw clean test \
-            -Dtest=tests.combined.CombinedSuiteRunner* \
-            -Dmaven.test.failure.ignore=true \
-            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-            -Dselenium.headless=true \
-            -Dsurefire.printSummary=true \
-            -Dsurefire.redirectTestOutputToFile=false
+          -Dtest=tests.combined.CombinedSuiteRunner \
+          -Dmaven.test.failure.ignore=true \
+          -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+          -Dselenium.headless=true \
+          -Dsurefire.printSummary=true \
+          -Dsurefire.redirectTestOutputToFile=false
 
-      - name: Show surefire logs
-        if: always()
-        run: cat regression-test-suite/target/surefire-reports/*.txt || echo "No surefire logs found"
-
-      - name: List generated files
+      - name: List generated reports and artifacts
         if: always()
         run: |
           echo "=== Reports ==="
           ls -R regression-test-suite/test-output/reports || echo "No reports found"
+          echo "=== Artifacts ==="
+          ls -R regression-test-suite/artifacts || echo "No artifacts found"
 
       - name: Upload HTML & CSV test reports
         if: always()
@@ -105,5 +101,14 @@ jobs:
           path: |
             regression-test-suite/test-output/reports/**/*.html
             regression-test-suite/test-output/reports/**/*.csv
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload screenshots & other artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-artifacts-${{ github.run_number }}
+          path: regression-test-suite/artifacts/**/*
           retention-days: 30
           if-no-files-found: ignore
