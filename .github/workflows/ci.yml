@@ -47,11 +47,12 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Install Chrome for headless Selenium/WebDriver tests
+      # Install Chrome for headless tests
       - name: Install Chrome for headless tests
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
+          sudo apt-get install -y chromium-chromedriver
 
       # Verify Chrome installation
       - name: Verify Chrome installation
@@ -61,51 +62,60 @@ jobs:
       - name: Wait for MySQL
         run: sleep 15
 
-      # Clean up any old reports or artifacts before test run
+      # Verify MySQL connection
+      - name: Verify MySQL connection
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
+
+      # Clean old reports & artifacts
       - name: Clean old reports & artifacts
         run: |
-          rm -rf regression-test-suite/test-output/reports || true
-          rm -rf regression-test-suite/artifacts || true
-          mkdir -p regression-test-suite/test-output/reports
-          mkdir -p regression-test-suite/artifacts
+          rm -rf regression-test-suite/regression-test-suite/test-output/reports || true
+          rm -rf regression-test-suite/regression-test-suite/artifacts || true
+          mkdir -p regression-test-suite/regression-test-suite/test-output/reports
+          mkdir -p regression-test-suite/regression-test-suite/artifacts
 
       # Make Maven wrapper executable
       - name: Make Maven wrapper executable
         run: chmod +x ./mvnw
-        working-directory: regression-test-suite
+        working-directory: regression-test-suite/regression-test-suite
 
       # Run Regression Tests (TestNG)
       - name: Run Regression Tests
-        working-directory: regression-test-suite
+        working-directory: regression-test-suite/regression-test-suite
         env:
           HEADLESS: true
         run: |
+          echo "Running TestNG CombinedSuiteRunner..."
           ./mvnw clean test \
-          -Dtest=tests.combined.CombinedSuiteRunner \
-          -Dmaven.test.failure.ignore=true \
-          -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-          -Dselenium.headless=true
+            -Dtest=tests.combined.CombinedSuiteRunner \
+            -Dmaven.test.failure.ignore=true \
+            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+            -Dselenium.headless=true
 
-      # Debug: list generated outputs after test execution
+      # Debug: List test outputs
       - name: List generated files
         if: always()
         run: |
-          echo "=== Reports Generated ==="
-          ls -R regression-test-suite/test-output/reports || echo "No reports found"
-          echo "=== Artifacts Generated ==="
-          ls -R regression-test-suite/artifacts || echo "No artifacts found"
+          echo "=== Reports ==="
+          ls -R regression-test-suite/regression-test-suite/test-output/reports || echo "No reports found"
+          echo "=== Artifacts ==="
+          ls -R regression-test-suite/regression-test-suite/artifacts || echo "No artifacts found"
+          echo "=== Surefire ==="
+          ls -R regression-test-suite/regression-test-suite/target/surefire-reports || echo "No surefire reports found"
 
-      # Upload fresh HTML & CSV test reports
+      # Upload HTML & CSV reports
       - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports
           path: |
-            regression-test-suite/test-output/reports/**/*.html
-            regression-test-suite/test-output/reports/**/*.csv
+            regression-test-suite/regression-test-suite/test-output/reports/**/*.html
+            regression-test-suite/regression-test-suite/test-output/reports/**/*.csv
           retention-days: 30
-          if-no-files-found: ignore  # Avoid failing if no new reports
+          if-no-files-found: ignore
 
       # Upload screenshots & artifacts
       - name: Upload screenshots & artifacts
@@ -113,6 +123,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-screenshots
-          path: regression-test-suite/artifacts/**/*
+          path: regression-test-suite/regression-test-suite/artifacts/**/*
           retention-days: 30
-          if-no-files-found: ignore  # Avoid warnings if folder empty
+          if-no-files-found: ignore
