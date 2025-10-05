@@ -15,6 +15,8 @@ env:
   SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/automation_testing?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
   SPRING_DATASOURCE_USERNAME: root
   SPRING_DATASOURCE_PASSWORD: root@123
+  SPRING_PROFILES_ACTIVE: test
+  LOGGING_LEVEL_ROOT: DEBUG
 
 jobs:
   build-and-test:
@@ -45,18 +47,26 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Install Chrome
+      - name: Install Chrome & ChromeDriver
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
           sudo apt-get install -y chromium-chromedriver
 
-      - name: Wait for MySQL
-        run: sleep 15
+      - name: Wait for MySQL to be ready
+        run: |
+          sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysql -h mysql -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
+              echo "MySQL is ready"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
 
       - name: Verify MySQL connection
         run: |
-          sudo apt-get install -y mysql-client
           mysql -h mysql -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
 
       - name: Make Maven wrapper executable
@@ -73,7 +83,9 @@ jobs:
             -Dtest=tests.combined.CombinedSuiteRunner* \
             -Dmaven.test.failure.ignore=true \
             -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-            -Dselenium.headless=true
+            -Dselenium.headless=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.redirectTestOutputToFile=false
 
       - name: Show surefire logs
         if: always()
