@@ -35,7 +35,7 @@ jobs:
           --health-retries=5
 
     steps:
-      # Checkout the repository
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -47,7 +47,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Install Chrome (for Selenium or WebDriver-based tests)
+      # Install Chrome for headless Selenium/WebDriver tests
       - name: Install Chrome for headless tests
         run: |
           sudo apt-get update
@@ -57,13 +57,15 @@ jobs:
       - name: Verify Chrome installation
         run: google-chrome --version || chromium-browser --version
 
-      # Wait a few seconds to ensure MySQL is ready
+      # Wait for MySQL container to become healthy
       - name: Wait for MySQL
         run: sleep 15
 
-      # Ensure artifacts & report folders exist
-      - name: Prepare folders
+      # Clean up any old reports or artifacts before test run
+      - name: Clean old reports & artifacts
         run: |
+          rm -rf regression-test-suite/test-output/reports || true
+          rm -rf regression-test-suite/artifacts || true
           mkdir -p regression-test-suite/test-output/reports
           mkdir -p regression-test-suite/artifacts
 
@@ -72,7 +74,7 @@ jobs:
         run: chmod +x ./mvnw
         working-directory: regression-test-suite
 
-      # Run Regression Tests (TestNG) in headless mode
+      # Run Regression Tests (TestNG)
       - name: Run Regression Tests
         working-directory: regression-test-suite
         env:
@@ -84,16 +86,16 @@ jobs:
           -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
           -Dselenium.headless=true
 
-      # Debug step: list generated outputs
+      # Debug: list generated outputs after test execution
       - name: List generated files
         if: always()
         run: |
-          echo "=== Reports ==="
+          echo "=== Reports Generated ==="
           ls -R regression-test-suite/test-output/reports || echo "No reports found"
-          echo "=== Artifacts ==="
+          echo "=== Artifacts Generated ==="
           ls -R regression-test-suite/artifacts || echo "No artifacts found"
 
-      # Upload HTML & CSV test reports
+      # Upload fresh HTML & CSV test reports
       - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -103,6 +105,7 @@ jobs:
             regression-test-suite/test-output/reports/**/*.html
             regression-test-suite/test-output/reports/**/*.csv
           retention-days: 30
+          if-no-files-found: ignore  # Avoid failing if no new reports
 
       # Upload screenshots & artifacts
       - name: Upload screenshots & artifacts
@@ -112,3 +115,4 @@ jobs:
           name: regression-test-screenshots
           path: regression-test-suite/artifacts/**/*
           retention-days: 30
+          if-no-files-found: ignore  # Avoid warnings if folder empty
