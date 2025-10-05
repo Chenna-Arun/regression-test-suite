@@ -47,7 +47,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Install Chrome for headless tests
+      # Install Chrome and ChromeDriver
       - name: Install Chrome for headless tests
         run: |
           sudo apt-get update
@@ -58,7 +58,7 @@ jobs:
       - name: Verify Chrome installation
         run: google-chrome --version || chromium-browser --version
 
-      # Wait for MySQL container to become healthy
+      # Wait for MySQL to be ready
       - name: Wait for MySQL
         run: sleep 15
 
@@ -76,10 +76,18 @@ jobs:
           mkdir -p regression-test-suite/regression-test-suite/test-output/reports
           mkdir -p regression-test-suite/regression-test-suite/artifacts
 
-      # Make Maven wrapper executable
-      - name: Make Maven wrapper executable
-        run: chmod +x ./mvnw
+      # Ensure Maven wrapper or install Maven if missing
+      - name: Ensure Maven available
         working-directory: regression-test-suite/regression-test-suite
+        run: |
+          if [ -f "./mvnw" ]; then
+            echo "Maven wrapper found."
+            chmod +x ./mvnw
+          else
+            echo "Maven wrapper not found, installing Maven globally..."
+            sudo apt-get install -y maven
+            mvn -v
+          fi
 
       # Run Regression Tests (TestNG)
       - name: Run Regression Tests
@@ -88,13 +96,21 @@ jobs:
           HEADLESS: true
         run: |
           echo "Running TestNG CombinedSuiteRunner..."
-          ./mvnw clean test \
-            -Dtest=tests.combined.CombinedSuiteRunner \
-            -Dmaven.test.failure.ignore=true \
-            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-            -Dselenium.headless=true
+          if [ -f "./mvnw" ]; then
+            ./mvnw clean test \
+              -Dtest=tests.combined.CombinedSuiteRunner \
+              -Dmaven.test.failure.ignore=true \
+              -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+              -Dselenium.headless=true
+          else
+            mvn clean test \
+              -Dtest=tests.combined.CombinedSuiteRunner \
+              -Dmaven.test.failure.ignore=true \
+              -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+              -Dselenium.headless=true
+          fi
 
-      # Debug: List test outputs
+      # Debug listing
       - name: List generated files
         if: always()
         run: |
@@ -105,7 +121,7 @@ jobs:
           echo "=== Surefire ==="
           ls -R regression-test-suite/regression-test-suite/target/surefire-reports || echo "No surefire reports found"
 
-      # Upload HTML & CSV reports
+      # Upload reports (HTML & CSV)
       - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
