@@ -305,45 +305,58 @@ public class TestIntegrationEngine {
     }
 
     private TestResult executeUITest(TestCase testCase) throws Exception {
-        return executeUITest(testCase, false, null);
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        // Remove headless mode to see browser in real-time
+        // options.addArguments("--headless=new");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        
+        WebDriver driver = new ChromeDriver(options);
+        TestResult result = new TestResult();
+        result.setTestCase(testCase);
+        result.setExecutedAt(OffsetDateTime.now());
+        
+        try {
+            // Execute based on test case name/description
+            if (testCase.getName().contains("BlazeDemo") || testCase.getDescription().contains("BlazeDemo")) {
+                result = executeBlazeDemoTest(driver, testCase);
+            } else {
+                // Default UI test - BlazeDemo
+                result = executeBlazeDemoTest(driver, testCase);
+            }
+        } finally {
+            driver.quit();
+        }
+        
+        return result;
     }
 
     private TestResult executeUITest(TestCase testCase, Boolean headless) throws Exception {
-        return executeUITest(testCase, headless, null);
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        if (Boolean.TRUE.equals(headless)) {
+            options.addArguments("--headless=new");
+        }
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        WebDriver driver = new ChromeDriver(options);
+        driver.manage().timeouts().pageLoadTimeout(java.time.Duration.ofSeconds(timeoutConfig.getUiPageLoadSeconds()));
+        try {
+            return executeBlazeDemoTest(driver, testCase, timeoutConfig.getUiElementWaitSeconds());
+        } finally {
+            driver.quit();
+        }
     }
 
     private TestResult executeUITest(TestCase testCase, Boolean headless, String executionId) throws Exception {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        
-        // Configure Chrome for CI environment
         if (Boolean.TRUE.equals(headless)) {
             options.addArguments("--headless=new");
         }
-        
-        // Essential CI options to prevent session conflicts
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
-        options.addArguments("--disable-web-security");
-        options.addArguments("--allow-running-insecure-content");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-plugins");
-        options.addArguments("--disable-images");
-        
-        // Use unique user data directory for each test to prevent conflicts
-        String userDataDir = System.getProperty("chrome.user.data.dir", "/tmp/chrome-user-data");
-        String uniqueUserDataDir = userDataDir + "/" + System.currentTimeMillis() + "_" + Thread.currentThread().getId();
-        options.addArguments("--user-data-dir=" + uniqueUserDataDir);
-        
-        // Set Chrome binary if specified
-        String chromeBinary = System.getProperty("chrome.binary");
-        if (chromeBinary != null && !chromeBinary.isEmpty()) {
-            options.setBinary(chromeBinary);
-        }
-        
-        System.out.println("🔧 Chrome Options: " + options.getArguments());
         WebDriver driver = new ChromeDriver(options);
         driver.manage().timeouts().pageLoadTimeout(java.time.Duration.ofSeconds(timeoutConfig.getUiPageLoadSeconds()));
         try {
