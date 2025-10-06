@@ -64,7 +64,23 @@ jobs:
         run: |
           echo "✅ Chrome installed at: ${{ steps.setup-chrome.outputs.chrome-path }}"
           google-chrome --version
-          # ChromeDriver will be managed by WebDriverManager in the code
+          
+          # Create unique Chrome user data directories for parallel execution
+          mkdir -p /tmp/chrome-user-data
+          chmod 777 /tmp/chrome-user-data
+          
+          # Setup virtual display for Chrome
+          sudo apt-get install -y xvfb
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          sleep 3
+          
+          # Set Chrome options for CI environment
+          echo "🔧 Chrome configuration for CI:"
+          echo "  - Headless mode: enabled"
+          echo "  - User data dir: /tmp/chrome-user-data"
+          echo "  - No sandbox: enabled for CI"
+          echo "  - Virtual display: :99"
 
       # 🕒 Step 5: Wait for MySQL to be ready
       - name: Wait for MySQL to be ready
@@ -111,6 +127,9 @@ jobs:
         env:
           HEADLESS: true
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROME_USER_DATA_DIR: /tmp/chrome-user-data
+          DISPLAY: :99
+          CHROME_OPTIONS: "--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080 --user-data-dir=/tmp/chrome-user-data"
         run: |
           echo "🚀 Starting CombinedSuiteRunner execution..."
           echo "📊 Test Configuration:"
@@ -153,6 +172,10 @@ jobs:
             -Dspring.profiles.active=test \
             -Dmaven.test.failure.ignore=false \
             -Dselenium.headless=true \
+            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+            -Dchrome.binary=$CHROME_BIN \
+            -Dchrome.options="$CHROME_OPTIONS" \
+            -Dchrome.user.data.dir="$CHROME_USER_DATA_DIR" \
             -Dsurefire.printSummary=true \
             -Dsurefire.useFile=true \
             -Dsurefire.reportFormat=xml \
