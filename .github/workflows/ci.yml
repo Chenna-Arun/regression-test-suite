@@ -130,19 +130,37 @@ jobs:
           echo "📋 Available test classes:"
           find src/test/java -name "*.java" -type f
           
-          # Run the test with Spring Boot profile and detailed logging
+          # First, test if Spring Boot context loads properly
+          echo "🔍 Testing Spring Boot context loading..."
+          ./mvnw test \
+            -Dtest=com.testframework.regression.RegressionTestSuiteFrameworkApplicationTests \
+            -Dspring.profiles.active=test \
+            -Dmaven.test.failure.ignore=true \
+            || echo "⚠️ Spring Boot context test failed"
+          
+          # Run diagnostic test to check framework components
+          echo "🔍 Running diagnostic test..."
+          ./mvnw test \
+            -Dtest=tests.diagnostic.SpringContextDiagnosticTest \
+            -Dspring.profiles.active=test \
+            -Dmaven.test.failure.ignore=true \
+            || echo "⚠️ Diagnostic test failed"
+          
+          # Run the main regression test with detailed logging
           echo "🚀 Running tests with detailed logging..."
           ./mvnw test \
             -Dtest=tests.combined.CombinedSuiteRunner \
             -Dspring.profiles.active=test \
-            -Dmaven.test.failure.ignore=true \
+            -Dmaven.test.failure.ignore=false \
             -Dselenium.headless=true \
             -Dsurefire.printSummary=true \
             -Dsurefire.useFile=true \
             -Dsurefire.reportFormat=xml \
             -Dlogging.level.com.testframework=DEBUG \
             -Dlogging.level.tests=DEBUG \
-            -X
+            -Dlogging.level.org.springframework.boot=INFO \
+            -Dlogging.level.org.springframework.context=INFO \
+            || echo "❌ Test execution failed, but continuing to collect logs..."
         continue-on-error: true
 
       # 📄 Step 9: Debug - List all generated files
@@ -152,6 +170,17 @@ jobs:
         run: |
           echo "=== 📊 SUREFIRE REPORTS ==="
           find target/surefire-reports -type f -name "*.xml" -o -name "*.txt" 2>/dev/null || echo "No surefire reports found"
+          
+          echo "=== 📄 SUREFIRE REPORT CONTENTS ==="
+          if [ -d "target/surefire-reports" ]; then
+            for file in target/surefire-reports/*.xml; do
+              if [ -f "$file" ]; then
+                echo "📄 Contents of $file:"
+                cat "$file" | head -50
+                echo "--- End of $file ---"
+              fi
+            done
+          fi
           
           echo "=== 📈 CUSTOM REPORTS ==="
           find test-output -type f 2>/dev/null || echo "No custom reports found"
@@ -163,13 +192,27 @@ jobs:
           ls -la
           ls -la target/ 2>/dev/null || echo "No target directory"
           
+          echo "=== 🔍 MAVEN BUILD LOGS ==="
+          if [ -f "target/surefire-reports/TEST-tests.combined.CombinedSuiteRunner.xml" ]; then
+            echo "📄 Test execution XML found"
+          else
+            echo "❌ No test execution XML found"
+          fi
+          
           echo "=== 🔍 SPRING BOOT LOGS ==="
           find . -name "*.log" -type f 2>/dev/null || echo "No log files found"
+          
+          echo "=== 🔍 MAVEN SUREFIRE LOGS ==="
+          if [ -d "target/surefire-reports" ]; then
+            ls -la target/surefire-reports/
+            echo "📄 Surefire text reports:"
+            find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec cat {} \;
+          fi
 
       # 📊 Step 10: Publish Test Results to GitHub
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() && hashFiles('regression-test-suite/target/surefire-reports/*.xml') != ''
         with:
           name: Regression Test Results
           path: 'regression-test-suite/target/surefire-reports/*.xml'
