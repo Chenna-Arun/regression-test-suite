@@ -33,18 +33,18 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root@123
           MYSQL_DATABASE: automation_testing
-        options: >
+        options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
 
     steps:
-      #  Step 1: Checkout code
+      # 🧩 Step 1: Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #  Step 2: Set up Java 21 with Maven cache
+      # ☕ Step 2: Set up Java 21 with Maven cache
       - name: Set up JDK 21 and Maven cache
         uses: actions/setup-java@v4
         with:
@@ -52,40 +52,40 @@ jobs:
           java-version: '21'
           cache: maven
 
-      #  Step 3: Install Chrome for Selenium (Updated method)
+      # 🌐 Step 3: Install Chrome for Selenium (Updated method)
       - name: Install Google Chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
         id: setup-chrome
 
-      #  Step 4: Display Chrome version and setup ChromeDriver
+      # 🔧 Step 4: Display Chrome version and setup ChromeDriver
       - name: Setup ChromeDriver
         run: |
-          echo "  Chrome installed at: ${{ steps.setup-chrome.outputs.chrome-path }}"
+          echo "✅ Chrome installed at: ${{ steps.setup-chrome.outputs.chrome-path }}"
           google-chrome --version
           # ChromeDriver will be managed by WebDriverManager in the code
 
-      #  Step 5: Wait for MySQL to be ready
+      # 🕒 Step 5: Wait for MySQL to be ready
       - name: Wait for MySQL to be ready
         run: |
           sudo apt-get update && sudo apt-get install -y mysql-client
-          echo "  Waiting for MySQL to be ready..."
+          echo "⏳ Waiting for MySQL to be ready..."
           for i in {1..30}; do
             if mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
-              echo "  MySQL is ready!"
+              echo "✅ MySQL is ready!"
               mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
               break
             fi
-            echo "  Attempt $i/30 - MySQL not ready yet..."
+            echo "⏳ Attempt $i/30 - MySQL not ready yet..."
             sleep 2
           done
 
-      #  Step 6: Clean and prepare directories
+      # 🧹 Step 6: Clean and prepare directories
       - name: Clean and prepare test directories
-        working-directory: regression-test-suite
+        working-directory: ./regression-test-suite
         run: |
-          echo "  Cleaning old reports and artifacts..."
+          echo "🧹 Cleaning old reports and artifacts..."
           rm -rf test-output/reports/* || true
           rm -rf artifacts/* || true
           rm -rf target/surefire-reports/* || true
@@ -95,28 +95,28 @@ jobs:
           mkdir -p artifacts
           mkdir -p target/surefire-reports
           
-          echo "  Directory structure:"
+          echo "📁 Directory structure:"
           ls -la
 
-      #  Step 7: Make Maven wrapper executable
+      # 🔧 Step 7: Make Maven wrapper executable
       - name: Make Maven wrapper executable
-        working-directory: regression-test-suite
+        working-directory: ./regression-test-suite
         run: |
           chmod +x ./mvnw
-          echo "  Maven wrapper is now executable"
+          echo "✅ Maven wrapper is now executable"
 
-      #  Step 8: Run Regression Test Suite
+      # 🧠 Step 8: Run Regression Test Suite
       - name: Run Regression Tests (CombinedSuiteRunner)
-        working-directory: regression-test-suite
+        working-directory: ./regression-test-suite
         env:
           HEADLESS: true
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
-          echo "  Starting CombinedSuiteRunner execution..."
-          echo "  Test Configuration:"
-          echo "    - Headless Mode: $HEADLESS"
-          echo "    - Chrome Path: $CHROME_BIN"
-          echo "    - MySQL URL: $SPRING_DATASOURCE_URL"
+          echo "🚀 Starting CombinedSuiteRunner execution..."
+          echo "📊 Test Configuration:"
+          echo "  - Headless Mode: $HEADLESS"
+          echo "  - Chrome Path: $CHROME_BIN"
+          echo "  - MySQL URL: $SPRING_DATASOURCE_URL"
           
           ./mvnw clean test \
             -Dtest=tests.combined.CombinedSuiteRunner \
@@ -129,87 +129,87 @@ jobs:
             -X
         continue-on-error: true
 
-      #  Step 9: Debug - List all generated files
+      # 📄 Step 9: Debug - List all generated files
       - name: Debug - List generated reports and artifacts
         if: always()
-        working-directory: regression-test-suite
+        working-directory: ./regression-test-suite
         run: |
-          echo "===  SUREFIRE REPORTS ==="
+          echo "=== 📊 SUREFIRE REPORTS ==="
           find target/surefire-reports -type f -name "*.xml" -o -name "*.txt" 2>/dev/null || echo "No surefire reports found"
           
-          echo "===  CUSTOM REPORTS ==="
+          echo "=== 📈 CUSTOM REPORTS ==="
           find test-output -type f 2>/dev/null || echo "No custom reports found"
           
-          echo "===  ARTIFACTS ==="
+          echo "=== 📸 ARTIFACTS ==="
           find artifacts -type f 2>/dev/null || echo "No artifacts found"
           
-          echo "===  FULL DIRECTORY STRUCTURE ==="
+          echo "=== 📁 FULL DIRECTORY STRUCTURE ==="
           ls -la
           ls -la target/ 2>/dev/null || echo "No target directory"
 
-      #  Step 10: Publish Test Results to GitHub
+      # 📊 Step 10: Publish Test Results to GitHub
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Regression Test Results
-          path: 'regression-test-suite/target/surefire-reports/*.xml'
+          path: './regression-test-suite/target/surefire-reports/*.xml'
           reporter: java-junit
           fail-on-error: false
 
-      #  Step 11: Upload Surefire Test Reports
+      # 📦 Step 11: Upload Surefire Test Reports
       - name: Upload Surefire Test Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports-${{ github.run_number }}
           path: |
-            regression-test-suite/target/surefire-reports/**/*
+            ./regression-test-suite/target/surefire-reports/**/*
           retention-days: 30
           if-no-files-found: warn
 
-      #  Step 12: Upload Custom HTML & CSV Reports
+      # 📈 Step 12: Upload Custom HTML & CSV Reports
       - name: Upload Custom Test Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: custom-test-reports-${{ github.run_number }}
           path: |
-            regression-test-suite/test-output/**/*.html
-            regression-test-suite/test-output/**/*.csv
-            regression-test-suite/test-output/**/*.xml
-            regression-test-suite/test-output/**/*.json
+            ./regression-test-suite/test-output/**/*.html
+            ./regression-test-suite/test-output/**/*.csv
+            ./regression-test-suite/test-output/**/*.xml
+            ./regression-test-suite/test-output/**/*.json
           retention-days: 30
           if-no-files-found: warn
 
-      #  Step 13: Upload Screenshots & Artifacts
+      # 🖼️ Step 13: Upload Screenshots & Artifacts
       - name: Upload Test Artifacts (Screenshots, Logs, etc.)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-${{ github.run_number }}
           path: |
-            regression-test-suite/artifacts/**/*
+            ./regression-test-suite/artifacts/**/*
           retention-days: 30
           if-no-files-found: warn
 
-      #  Step 14: Upload Maven Logs
+      # 📋 Step 14: Upload Maven Logs
       - name: Upload Maven Logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: maven-logs-${{ github.run_number }}
           path: |
-            regression-test-suite/target/**/*.log
+            ./regression-test-suite/target/**/*.log
           retention-days: 7
           if-no-files-found: ignore
 
-      #  Step 15: Generate Test Summary
+      # 📝 Step 15: Generate Test Summary
       - name: Generate Test Summary
         if: always()
-        working-directory: regression-test-suite
+        working-directory: ./regression-test-suite
         run: |
-          echo "##  Regression Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Regression Test Execution Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Execution Time**: $(date)" >> $GITHUB_STEP_SUMMARY
           echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
@@ -220,10 +220,10 @@ jobs:
           CUSTOM_COUNT=$(find test-output -name "*.html" -o -name "*.csv" 2>/dev/null | wc -l || echo "0")
           ARTIFACT_COUNT=$(find artifacts -type f 2>/dev/null | wc -l || echo "0")
           
-          echo "###  Generated Files:" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Generated Files:" >> $GITHUB_STEP_SUMMARY
           echo "- **Surefire Reports**: $SUREFIRE_COUNT files" >> $GITHUB_STEP_SUMMARY
           echo "- **Custom Reports**: $CUSTOM_COUNT files" >> $GITHUB_STEP_SUMMARY
           echo "- **Artifacts**: $ARTIFACT_COUNT files" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "###  Download Artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Download Artifacts:" >> $GITHUB_STEP_SUMMARY
           echo "All reports and artifacts are available in the **Artifacts** section of this workflow run." >> $GITHUB_STEP_SUMMARY
