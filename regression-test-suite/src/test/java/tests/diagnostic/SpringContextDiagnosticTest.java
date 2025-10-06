@@ -65,10 +65,38 @@ public class SpringContextDiagnosticTest extends AbstractTestNGSpringContextTest
             System.err.println("  - DataSource: ❌ NULL");
         }
         
-        // Test Suite Registry
-        System.out.println("📋 Suite Registry Test:");
+        // Test Suite Registry and Database Content
+        System.out.println("📋 Suite Registry & Database Test:");
         if (suiteRegistry != null) {
             try {
+                // First, check what's in the database
+                System.out.println("🗄️ Database Content Check:");
+                if (applicationContext.containsBean("testCaseService")) {
+                    var testCaseService = applicationContext.getBean("testCaseService");
+                    try {
+                        var allTestCases = (java.util.List<?>) testCaseService.getClass().getMethod("findAll").invoke(testCaseService);
+                        System.out.println("  - Total test cases in database: " + allTestCases.size());
+                        
+                        if (allTestCases.size() > 0) {
+                            System.out.println("  - Sample test cases:");
+                            for (int i = 0; i < Math.min(5, allTestCases.size()); i++) {
+                                var tc = allTestCases.get(i);
+                                var id = tc.getClass().getMethod("getId").invoke(tc);
+                                var name = tc.getClass().getMethod("getName").invoke(tc);
+                                var type = tc.getClass().getMethod("getType").invoke(tc);
+                                System.out.println("    - ID: " + id + ", Name: " + name + ", Type: " + type);
+                            }
+                        } else {
+                            System.err.println("  - ❌ DATABASE IS EMPTY! No test cases found.");
+                            System.err.println("  - This explains why no test suites are resolved.");
+                        }
+                    } catch (Exception dbE) {
+                        System.err.println("  - Database query error: " + dbE.getMessage());
+                    }
+                }
+                
+                // Now test suite resolution
+                System.out.println("📋 Suite Resolution Test:");
                 var blazeTests = suiteRegistry.resolveSuiteToTestCaseIds("BLAZE_SMOKE");
                 var reqresTests = suiteRegistry.resolveSuiteToTestCaseIds("REQRES_SMOKE");
                 
@@ -77,8 +105,10 @@ public class SpringContextDiagnosticTest extends AbstractTestNGSpringContextTest
                 System.out.println("  - REQRES_SMOKE Suite: " + 
                     (reqresTests.isPresent() ? reqresTests.get().size() + " tests" : "Not found"));
                     
-                if (blazeTests.isEmpty() && reqresTests.isEmpty()) {
-                    System.err.println("  - ⚠️ WARNING: No test suites found! Check database initialization.");
+                if (blazeTests.isPresent() && blazeTests.get().isEmpty() && 
+                    reqresTests.isPresent() && reqresTests.get().isEmpty()) {
+                    System.err.println("  - ⚠️ WARNING: Suite registry found but returned empty lists!");
+                    System.err.println("  - This indicates test cases exist but names don't match expected names.");
                 }
             } catch (Exception e) {
                 System.err.println("  - Suite Registry Error: " + e.getMessage());
