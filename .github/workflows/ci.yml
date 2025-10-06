@@ -45,7 +45,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Install Chrome
+      - name: Install Chrome and ChromeDriver
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
@@ -56,55 +56,57 @@ jobs:
           sudo apt-get install -y mysql-client
           for i in {1..30}; do
             if mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
-              echo "MySQL is ready"
+              echo "✅ MySQL is ready"
               break
             fi
-            echo "Waiting for MySQL..."
+            echo "⏳ Waiting for MySQL..."
             sleep 2
           done
 
-      - name: Clean old reports
+      - name: Clean old reports and artifacts
         run: |
-          rm -rf regression-test-suite/test-output/reports/*
+          rm -rf regression-test-suite/test-output/*
           rm -rf regression-test-suite/artifacts/*
 
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
         run: chmod +x ./mvnw
 
-      - name: Run Regression Tests
+      - name: Run Regression Tests (TestNG CombinedSuiteRunner)
         working-directory: regression-test-suite
         env:
           HEADLESS: true
         run: |
+          echo "🚀 Starting regression tests..."
           ./mvnw clean test \
-          -Dtest=tests.combined.CombinedSuiteRunner \
-          -Dmaven.test.failure.ignore=true \
-          -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-          -Dselenium.headless=true \
-          -Dsurefire.printSummary=true \
-          -Dsurefire.redirectTestOutputToFile=false
+            -Dtest=tests.combined.CombinedSuiteRunner \
+            -Dmaven.test.failure.ignore=true \
+            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+            -Dselenium.headless=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.redirectTestOutputToFile=false
 
       - name: List generated reports and artifacts
         if: always()
         run: |
           echo "=== Reports ==="
-          ls -R regression-test-suite/test-output/reports || echo "No reports found"
+          ls -R regression-test-suite/test-output || echo "No reports found"
           echo "=== Artifacts ==="
           ls -R regression-test-suite/artifacts || echo "No artifacts found"
 
-      - name: Upload HTML & CSV test reports
+      - name: Upload TestNG Reports (HTML, XML, CSV)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports-${{ github.run_number }}
           path: |
-            regression-test-suite/test-output/reports/**/*.html
-            regression-test-suite/test-output/reports/**/*.csv
+            regression-test-suite/test-output/**/*.html
+            regression-test-suite/test-output/**/*.xml
+            regression-test-suite/test-output/**/*.csv
           retention-days: 30
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
-      - name: Upload screenshots & other artifacts
+      - name: Upload Screenshots & Other Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
