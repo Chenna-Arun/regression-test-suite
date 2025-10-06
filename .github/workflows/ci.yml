@@ -165,16 +165,33 @@ jobs:
             -Dmaven.test.failure.ignore=true \
             || echo "⚠️ Diagnostic test failed"
           
+          # Run simple passing test to ensure basic functionality
+          echo "🎯 Running simple passing test..."
+          ./mvnw test \
+            -Dtest=tests.simple.SimplePassingTest \
+            -Dmaven.test.failure.ignore=true \
+            || echo "⚠️ Simple test failed"
+          
           # Run the main regression test with detailed logging
           echo "🚀 Running tests with detailed logging..."
+          echo "📊 Environment Check:"
+          echo "  - Chrome Binary: $CHROME_BIN"
+          echo "  - Chrome Options: $CHROME_OPTIONS"
+          echo "  - User Data Dir: $CHROME_USER_DATA_DIR"
+          echo "  - Display: $DISPLAY"
+          
+          # Test Chrome binary directly first
+          echo "🔍 Testing Chrome binary..."
+          $CHROME_BIN --version || echo "⚠️ Chrome binary test failed"
+          
+          # Run with forced success to ensure artifacts are generated
           ./mvnw test \
             -Dtest=tests.combined.CombinedSuiteRunner \
             -Dspring.profiles.active=test \
-            -Dmaven.test.failure.ignore=false \
+            -Dmaven.test.failure.ignore=true \
             -Dselenium.headless=true \
             -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-            -Dchrome.binary=$CHROME_BIN \
-            -Dchrome.options="$CHROME_OPTIONS" \
+            -Dchrome.binary="$CHROME_BIN" \
             -Dchrome.user.data.dir="$CHROME_USER_DATA_DIR" \
             -Dsurefire.printSummary=true \
             -Dsurefire.useFile=true \
@@ -183,7 +200,14 @@ jobs:
             -Dlogging.level.tests=DEBUG \
             -Dlogging.level.org.springframework.boot=INFO \
             -Dlogging.level.org.springframework.context=INFO \
+            -X \
             || echo "❌ Test execution failed, but continuing to collect logs..."
+          
+          echo "📊 Post-execution check:"
+          echo "  - Exit code: $?"
+          echo "  - Current directory: $(pwd)"
+          echo "  - Directory contents:"
+          ls -la
         continue-on-error: true
 
       # 📄 Step 9: Debug - List all generated files
@@ -231,6 +255,51 @@ jobs:
             echo "📄 Surefire text reports:"
             find target/surefire-reports -name "*.txt" -exec echo "=== {} ===" \; -exec cat {} \;
           fi
+          
+          echo "=== 🔧 CREATING FALLBACK ARTIFACTS ==="
+          # Create basic artifacts if none exist to help with debugging
+          mkdir -p target/surefire-reports test-output artifacts
+          
+          if [ ! -f "target/surefire-reports/TEST-tests.combined.CombinedSuiteRunner.xml" ]; then
+            echo "Creating fallback surefire report..."
+            cat > target/surefire-reports/TEST-tests.combined.CombinedSuiteRunner.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tests.combined.CombinedSuiteRunner" time="0.0" tests="1" errors="0" skipped="0" failures="1">
+  <testcase name="runCombinedSuiteInParallel" classname="tests.combined.CombinedSuiteRunner" time="0.0">
+    <failure message="Test execution failed - check logs for details" type="java.lang.RuntimeException">
+      Test execution failed during CI run. Check Maven logs and Chrome configuration.
+    </failure>
+  </testcase>
+</testsuite>
+EOF
+          fi
+          
+          # Create a comprehensive debug report
+          echo "=== CI EXECUTION DEBUG REPORT ===" > test-output/debug-report.txt
+          echo "Execution Time: $(date)" >> test-output/debug-report.txt
+          echo "Workflow Run: ${{ github.run_number }}" >> test-output/debug-report.txt
+          echo "Commit: ${{ github.sha }}" >> test-output/debug-report.txt
+          echo "Runner OS: $(uname -a)" >> test-output/debug-report.txt
+          echo "" >> test-output/debug-report.txt
+          
+          echo "=== ENVIRONMENT VARIABLES ===" >> test-output/debug-report.txt
+          echo "CHROME_BIN: $CHROME_BIN" >> test-output/debug-report.txt
+          echo "CHROME_OPTIONS: $CHROME_OPTIONS" >> test-output/debug-report.txt
+          echo "CHROME_USER_DATA_DIR: $CHROME_USER_DATA_DIR" >> test-output/debug-report.txt
+          echo "DISPLAY: $DISPLAY" >> test-output/debug-report.txt
+          echo "" >> test-output/debug-report.txt
+          
+          echo "=== DIRECTORY STRUCTURE ===" >> test-output/debug-report.txt
+          find . -type f -name "*.xml" -o -name "*.txt" -o -name "*.log" | head -20 >> test-output/debug-report.txt
+          echo "" >> test-output/debug-report.txt
+          
+          echo "=== CHROME VERSION ===" >> test-output/debug-report.txt
+          $CHROME_BIN --version >> test-output/debug-report.txt 2>&1 || echo "Chrome version check failed" >> test-output/debug-report.txt
+          
+          # Create basic execution summary for compatibility
+          echo "CI Execution Summary - $(date)" > test-output/execution-summary.txt
+          echo "Workflow run: ${{ github.run_number }}" >> test-output/execution-summary.txt
+          echo "Commit: ${{ github.sha }}" >> test-output/execution-summary.txt
 
       # 📊 Step 10: Publish Test Results to GitHub
       - name: Publish Test Results
@@ -260,10 +329,7 @@ jobs:
         with:
           name: custom-test-reports-${{ github.run_number }}
           path: |
-            regression-test-suite/test-output/**/*.html
-            regression-test-suite/test-output/**/*.csv
-            regression-test-suite/test-output/**/*.xml
-            regression-test-suite/test-output/**/*.json
+            regression-test-suite/test-output/**/*
           retention-days: 30
           if-no-files-found: warn
 
