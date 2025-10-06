@@ -72,14 +72,14 @@ jobs:
         working-directory: regression-test-suite
         run: chmod +x ./mvnw
 
-      - name: Run Regression Tests (TestNG CombinedSuiteRunner)
+      - name: Run Regression Tests (TestNG Suite)
         working-directory: regression-test-suite
         env:
           HEADLESS: true
         run: |
-          echo "🚀 Starting regression tests..."
+          echo "🚀 Running TestNG suite..."
           ./mvnw clean test \
-            -Dtest=tests.combined.CombinedSuiteRunner \
+            -Dsurefire.suiteXmlFiles=src/test/resources/suites/combined_suite.xml \
             -Dmaven.test.failure.ignore=true \
             -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
             -Dselenium.headless=true \
