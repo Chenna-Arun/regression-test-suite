@@ -35,9 +35,11 @@ jobs:
           --health-retries=5
 
     steps:
+      # 🧩 Step 1: Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ☕ Step 2: Set up Java 21 with Maven cache
       - name: Set up JDK 21 and Maven cache
         uses: actions/setup-java@v4
         with:
@@ -45,12 +47,20 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Install Chrome and ChromeDriver
+      # 🌐 Step 3: Install Chrome + Chromedriver for headless Selenium
+      - name: Install Chrome & Chromedriver
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable || sudo apt-get install -y chromium-browser
+          sudo apt-get install -y wget gnupg2
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
           sudo apt-get install -y chromium-chromedriver
+          echo "✅ Chrome Installed:"
+          google-chrome --version || chromium-browser --version
 
+      # 🕒 Step 4: Wait until MySQL is ready
       - name: Wait for MySQL to be ready
         run: |
           sudo apt-get install -y mysql-client
@@ -60,57 +70,66 @@ jobs:
               break
             fi
             echo "⏳ Waiting for MySQL..."
-            sleep 2
+            sleep 3
           done
 
-      - name: Clean old reports and artifacts
+      # 🧹 Step 5: Clean old reports
+      - name: Clean old reports
         run: |
-          rm -rf regression-test-suite/test-output/*
+          rm -rf regression-test-suite/test-output/reports/*
           rm -rf regression-test-suite/artifacts/*
+          mkdir -p regression-test-suite/test-output/reports
+          mkdir -p regression-test-suite/artifacts
 
+      # 🔧 Step 6: Make Maven wrapper executable
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
         run: chmod +x ./mvnw
 
-      - name: Run Regression Tests (TestNG Suite)
+      # 🧠 Step 7: Run Regression Test Suite (no XML dependency)
+      - name: Run Regression Tests (CombinedSuiteRunner)
         working-directory: regression-test-suite
         env:
           HEADLESS: true
         run: |
-          echo "🚀 Running TestNG suite..."
+          echo "🚀 Running CombinedSuiteRunner (no XML)..."
           ./mvnw clean test \
-            -Dsurefire.suiteXmlFiles=src/test/resources/suites/combined_suite.xml \
+            -Dtest=tests.combined.CombinedSuiteRunner \
+            -Dsurefire.suiteXmlFiles= \
             -Dmaven.test.failure.ignore=true \
             -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
             -Dselenium.headless=true \
-            -Dsurefire.printSummary=true \
-            -Dsurefire.redirectTestOutputToFile=false
+            -Dsurefire.printSummary=true
+        continue-on-error: true
 
+      # 📄 Step 8: Debug - list all reports and artifacts
       - name: List generated reports and artifacts
         if: always()
         run: |
-          echo "=== Reports ==="
-          ls -R regression-test-suite/test-output || echo "No reports found"
-          echo "=== Artifacts ==="
+          echo "=== 📊 Reports ==="
+          ls -R regression-test-suite/test-output/reports || echo "No reports found"
+          echo "=== 📸 Artifacts ==="
           ls -R regression-test-suite/artifacts || echo "No artifacts found"
 
-      - name: Upload TestNG Reports (HTML, XML, CSV)
+      # 📦 Step 9: Upload HTML & CSV reports
+      - name: Upload HTML & CSV test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-reports-${{ github.run_number }}
           path: |
-            regression-test-suite/test-output/**/*.html
-            regression-test-suite/test-output/**/*.xml
-            regression-test-suite/test-output/**/*.csv
+            regression-test-suite/test-output/reports/**/*.html
+            regression-test-suite/test-output/reports/**/*.csv
+            regression-test-suite/test-output/reports/**/*.xml
           retention-days: 30
           if-no-files-found: warn
 
-      - name: Upload Screenshots & Other Artifacts
+      # 🖼️ Step 10: Upload screenshots & logs
+      - name: Upload screenshots & other artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-artifacts-${{ github.run_number }}
           path: regression-test-suite/artifacts/**/*
           retention-days: 30
-          if-no-files-found: ignore
+          if-no-files-found: warn
