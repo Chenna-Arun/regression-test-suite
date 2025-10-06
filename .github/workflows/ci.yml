@@ -40,9 +40,11 @@ jobs:
           --health-retries=10
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Set up JDK 21 with Maven cache
       - name: Set up JDK 21 and Maven cache
         uses: actions/setup-java@v4
         with:
@@ -50,27 +52,27 @@ jobs:
           java-version: '21'
           cache: maven
 
+      # 3️⃣ Install Google Chrome
       - name: Install Google Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-        id: setup-chrome
-
-      - name: Install ChromeDriver
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip xvfb
-          CHROME_VER=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-          echo "Chrome version: $CHROME_VER"
-          wget -q "https://chromedriver.storage.googleapis.com/$CHROME_VER/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/bin/chromedriver
-          sudo chmod +x /usr/bin/chromedriver
+          sudo apt-get install -y wget gnupg
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      # 4️⃣ Install ChromeDriver
+      - name: Install ChromeDriver
+        run: |
+          sudo apt-get install -y chromium-chromedriver unzip xvfb
+          sudo ln -sf /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
           echo "✅ ChromeDriver installed"
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
           mkdir -p /tmp/chrome-user-data
 
+      # 5️⃣ Wait for MySQL service
       - name: Wait for MySQL to be ready
         run: |
           sudo apt-get install -y mysql-client
@@ -83,16 +85,19 @@ jobs:
             sleep 2
           done
 
+      # 6️⃣ Prepare directories
       - name: Clean and prepare directories
         working-directory: regression-test-suite
         run: |
           rm -rf test-output/reports artifacts target/surefire-reports || true
           mkdir -p test-output/reports artifacts target/surefire-reports
 
+      # 7️⃣ Make Maven wrapper executable
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
         run: chmod +x ./mvnw
 
+      # 8️⃣ Run regression tests
       - name: Run Regression Tests
         working-directory: regression-test-suite
         env:
@@ -113,16 +118,18 @@ jobs:
             -Dsurefire.reportFormat=xml \
             -Dmaven.test.failure.ignore=true || true
 
+      # 9️⃣ Debug generated reports
       - name: Debug Reports
         working-directory: regression-test-suite
         run: |
-          echo "🔍 Checking surefire reports..."
+          echo "🔍 Listing surefire reports..."
           ls -la target/surefire-reports || echo "No surefire reports found"
-          echo "🔍 Checking custom reports..."
+          echo "🔍 Listing custom reports..."
           ls -la test-output || echo "No custom reports found"
-          echo "🔍 Checking artifacts..."
+          echo "🔍 Listing artifacts..."
           ls -la artifacts || echo "No artifacts found"
 
+      # 🔟 Publish JUnit test results
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
         if: always() && hashFiles('regression-test-suite/target/surefire-reports/*.xml') != ''
@@ -132,6 +139,7 @@ jobs:
           reporter: java-junit
           fail-on-error: false
 
+      # 1️⃣1️⃣ Upload Surefire XML reports
       - name: Upload Surefire Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -141,6 +149,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
+      # 1️⃣2️⃣ Upload custom reports
       - name: Upload Custom Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -150,6 +159,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
+      # 1️⃣3️⃣ Upload additional artifacts
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -159,6 +169,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
+      # 1️⃣4️⃣ Generate Test Summary
       - name: Generate Test Summary
         if: always()
         working-directory: regression-test-suite
