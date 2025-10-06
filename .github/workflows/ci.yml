@@ -56,71 +56,72 @@ jobs:
           chrome-version: stable
         id: setup-chrome
 
-      - name: Setup ChromeDriver
+      - name: Install ChromeDriver
         run: |
-          echo "✅ Chrome installed at: ${{ steps.setup-chrome.outputs.chrome-path }}"
-          google-chrome --version
-          mkdir -p /tmp/chrome-user-data
-          chmod 777 /tmp/chrome-user-data
-          sudo apt-get install -y xvfb
+          sudo apt-get update
+          sudo apt-get install -y unzip xvfb
+          CHROME_VER=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+          echo "Chrome version: $CHROME_VER"
+          wget -q "https://chromedriver.storage.googleapis.com/$CHROME_VER/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/bin/chromedriver
+          sudo chmod +x /usr/bin/chromedriver
+          echo "✅ ChromeDriver installed"
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-          sleep 3
-          echo "🔧 Chrome configuration for CI:"
-          echo "  - Headless mode: enabled"
-          echo "  - User data dir: /tmp/chrome-user-data"
-          echo "  - No sandbox: enabled for CI"
-          echo "  - Virtual display: :99"
+          mkdir -p /tmp/chrome-user-data
 
       - name: Wait for MySQL to be ready
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
-          echo "⏳ Waiting for MySQL to be ready..."
+          sudo apt-get install -y mysql-client
           for i in {1..30}; do
             if mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
-              echo "✅ MySQL is ready!"
-              mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SHOW DATABASES;"
+              echo "✅ MySQL is ready"
               break
             fi
-            echo "⏳ Attempt $i/30 - MySQL not ready yet..."
+            echo "⏳ Waiting for MySQL ($i/30)..."
             sleep 2
           done
 
-      - name: Clean and prepare test directories
+      - name: Clean and prepare directories
         working-directory: regression-test-suite
         run: |
-          echo "🧹 Cleaning old reports and artifacts..."
-          rm -rf test-output/reports/* artifacts/* target/surefire-reports/* || true
+          rm -rf test-output/reports artifacts target/surefire-reports || true
           mkdir -p test-output/reports artifacts target/surefire-reports
-          echo "📁 Directory structure:"
-          ls -la
 
       - name: Make Maven wrapper executable
         working-directory: regression-test-suite
         run: chmod +x ./mvnw
 
-      - name: Run Regression Tests (CombinedSuiteRunner)
+      - name: Run Regression Tests
         working-directory: regression-test-suite
         env:
           HEADLESS: true
-          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROME_BIN: /usr/bin/google-chrome
           CHROME_USER_DATA_DIR: /tmp/chrome-user-data
           DISPLAY: :99
           CHROME_OPTIONS: "--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080 --user-data-dir=/tmp/chrome-user-data"
         run: |
-          echo "🚀 Starting CombinedSuiteRunner execution..."
-          ./mvnw clean compile test-compile
-          ./mvnw test -Dtest=com.testframework.regression.RegressionTestSuiteFrameworkApplicationTests -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true || true
-          ./mvnw test -Dtest=tests.diagnostic.SpringContextDiagnosticTest -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true || true
-          ./mvnw test -Dtest=tests.simple.SimplePassingTest -Dmaven.test.failure.ignore=true || true
-          ./mvnw test -Dtest=tests.combined.CombinedSuiteRunner -Dspring.profiles.active=test -Dmaven.test.failure.ignore=true -Dselenium.headless=true -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dchrome.binary="$CHROME_BIN" -Dchrome.user.data.dir="$CHROME_USER_DATA_DIR" -Dsurefire.printSummary=true -Dsurefire.useFile=true -Dsurefire.reportFormat=xml -Dlogging.level.com.testframework=DEBUG -Dlogging.level.tests=DEBUG -Dlogging.level.org.springframework.boot=INFO -Dlogging.level.org.springframework.context=INFO -X || true
-        continue-on-error: true
+          echo "🚀 Starting regression tests..."
+          ./mvnw clean test \
+            -Dspring.profiles.active=test \
+            -Dchrome.binary="$CHROME_BIN" \
+            -Dchrome.user.data.dir="$CHROME_USER_DATA_DIR" \
+            -Dselenium.headless=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.useFile=true \
+            -Dsurefire.reportFormat=xml \
+            -Dmaven.test.failure.ignore=true || true
 
-      - name: Debug - List generated reports and artifacts
-        if: always()
+      - name: Debug Reports
         working-directory: regression-test-suite
         run: |
-          find target/surefire-reports test-output artifacts -type f || echo "No reports or artifacts found"
+          echo "🔍 Checking surefire reports..."
+          ls -la target/surefire-reports || echo "No surefire reports found"
+          echo "🔍 Checking custom reports..."
+          ls -la test-output || echo "No custom reports found"
+          echo "🔍 Checking artifacts..."
+          ls -la artifacts || echo "No artifacts found"
 
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
@@ -131,7 +132,7 @@ jobs:
           reporter: java-junit
           fail-on-error: false
 
-      - name: Upload Surefire Test Reports
+      - name: Upload Surefire Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -140,32 +141,23 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-      - name: Upload Custom Test Reports
+      - name: Upload Custom Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: custom-test-reports-${{ github.run_number }}
+          name: custom-reports-${{ github.run_number }}
           path: regression-test-suite/test-output/**/*
           retention-days: 30
           if-no-files-found: warn
 
-      - name: Upload Test Artifacts (Screenshots, Logs, etc.)
+      - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-artifacts-${{ github.run_number }}
+          name: artifacts-${{ github.run_number }}
           path: regression-test-suite/artifacts/**/*
           retention-days: 30
           if-no-files-found: warn
-
-      - name: Upload Maven Logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-logs-${{ github.run_number }}
-          path: regression-test-suite/target/**/*.log
-          retention-days: 7
-          if-no-files-found: ignore
 
       - name: Generate Test Summary
         if: always()
@@ -176,9 +168,8 @@ jobs:
           echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           SUREFIRE_COUNT=$(find target/surefire-reports -name "*.xml" 2>/dev/null | wc -l || echo "0")
-          CUSTOM_COUNT=$(find test-output -name "*.html" -o -name "*.csv" 2>/dev/null | wc -l || echo "0")
+          CUSTOM_COUNT=$(find test-output -type f 2>/dev/null | wc -l || echo "0")
           ARTIFACT_COUNT=$(find artifacts -type f 2>/dev/null | wc -l || echo "0")
-          echo "### 📊 Generated Files:" >> $GITHUB_STEP_SUMMARY
           echo "- **Surefire Reports**: $SUREFIRE_COUNT files" >> $GITHUB_STEP_SUMMARY
           echo "- **Custom Reports**: $CUSTOM_COUNT files" >> $GITHUB_STEP_SUMMARY
           echo "- **Artifacts**: $ARTIFACT_COUNT files" >> $GITHUB_STEP_SUMMARY
