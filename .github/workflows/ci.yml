@@ -2,11 +2,9 @@ name: Regression Testing CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
@@ -40,7 +38,7 @@ jobs:
           --health-retries=10
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -52,45 +50,47 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # 3️⃣ Install Google Chrome
-      - name: Install Google Chrome
+      # 3️⃣ Install Google Chrome and ChromeDriver
+      - name: Install Google Chrome and ChromeDriver
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget gnupg
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get install -y wget gnupg unzip
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome-keyring.gpg > /dev/null
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-
-      # 4️⃣ Install ChromeDriver and setup display
-      - name: Install ChromeDriver
-        run: |
-          sudo apt-get install -y chromium-chromedriver unzip xvfb
+          sudo apt-get install -y google-chrome-stable chromium-chromedriver
           sudo ln -sf /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
-          echo "✅ ChromeDriver installed"
+          echo "✅ Chrome and ChromeDriver installed"
+
+      # 4️⃣ Setup Virtual Display
+      - name: Setup Virtual Display
+        run: |
+          sudo apt-get install -y xvfb
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
           mkdir -p /tmp/chrome-user-data
+          echo "✅ Virtual display setup complete"
 
       # 5️⃣ Wait for MySQL service
       - name: Wait for MySQL to be ready
         run: |
           sudo apt-get install -y mysql-client
-          for i in {1..30}; do
+          echo "⏳ Waiting for MySQL to be ready..."
+          for i in {1..60}; do
             if mysql -h 127.0.0.1 -P 3306 -u root -proot@123 -e "SELECT 1;" &>/dev/null; then
               echo "✅ MySQL is ready"
               break
             fi
-            echo "⏳ Waiting for MySQL ($i/30)..."
+            echo "⏳ Attempt $i/60 - MySQL not ready yet..."
             sleep 2
           done
 
       # 6️⃣ Prepare directories
-      - name: Clean and prepare directories
+      - name: Prepare directories
         working-directory: regression-test-suite
         run: |
-          rm -rf test-output/reports artifacts target/surefire-reports || true
-          mkdir -p test-output/reports artifacts target/surefire-reports
+          rm -rf test-output reports artifacts target/surefire-reports || true
+          mkdir -p test-output reports artifacts target/surefire-reports
 
       # 7️⃣ Make Maven wrapper executable
       - name: Make Maven wrapper executable
@@ -107,159 +107,32 @@ jobs:
           DISPLAY: :99
           CHROME_OPTIONS: "--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --window-size=1920,1080 --user-data-dir=/tmp/chrome-user-data"
         run: |
-          echo "🚀 Starting regression tests..."
-          
-          # Step 1: Compile and prepare
-          echo "📦 Compiling project..."
-          ./mvnw clean compile test-compile
-          
-          # Step 2: Run diagnostic test first
-          echo "🔍 Running diagnostic test..."
-          ./mvnw test \
-            -Dtest=tests.diagnostic.SpringContextDiagnosticTest \
+          echo "🚀 Running regression tests..."
+          ./mvnw clean test \
             -Dspring.profiles.active=test \
-            -Dmaven.test.failure.ignore=true || echo "⚠️ Diagnostic test failed"
-          
-          # Step 3: Run main regression test suite
-          echo "🎯 Running CombinedSuiteRunner..."
-          ./mvnw test \
-            -Dtest=tests.combined.CombinedSuiteRunner \
-            -Dspring.profiles.active=test \
-            -Dchrome.binary="$CHROME_BIN" \
-            -Dchrome.user.data.dir="$CHROME_USER_DATA_DIR" \
+            -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
             -Dselenium.headless=true \
-            -Dsurefire.printSummary=true \
-            -Dsurefire.useFile=true \
-            -Dsurefire.reportFormat=xml \
-            -Dlogging.level.com.testframework=DEBUG \
-            -Dmaven.test.failure.ignore=true || echo "⚠️ Main test suite failed"
+            -Dmaven.test.failure.ignore=true
         continue-on-error: true
 
-      # 9️⃣ Debug generated reports and create fallbacks
-      - name: Debug Reports and Create Fallbacks
-        if: always()
-        working-directory: regression-test-suite
-        run: |
-          echo "🔍 Analyzing generated reports..."
-          
-          mkdir -p target/surefire-reports test-output artifacts
-
-          # Show what was generated
-          echo "=== 📊 SUREFIRE REPORTS ==="
-          find target/surefire-reports -type f -name "*.xml" -o -name "*.txt" 2>/dev/null || echo "No surefire reports found"
-          
-          echo "=== 📈 CUSTOM REPORTS ==="
-          find test-output -type f 2>/dev/null || echo "No custom reports found"
-          
-          echo "=== 📸 ARTIFACTS ==="
-          find artifacts -type f 2>/dev/null || echo "No artifacts found"
-
-          # Create fallback XML report if missing
-          if [ ! -f "target/surefire-reports/TEST-tests.combined.CombinedSuiteRunner.xml" ]; then
-            echo "📄 Creating fallback test report..."
-            cat > target/surefire-reports/TEST-fallback-execution.xml <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <testsuite name="tests.combined.CombinedSuiteRunner" tests="1" failures="0" errors="0" skipped="0" time="0.001">
-            <testcase name="runCombinedSuiteInParallel" classname="tests.combined.CombinedSuiteRunner" time="0.001">
-              <system-out>Test execution completed - check logs for details</system-out>
-            </testcase>
-          </testsuite>
-          EOF
-          fi
-
-          # Create basic HTML report if missing
-          if [ ! -f "test-output/execution-report.html" ]; then
-            echo "📄 Creating fallback HTML report..."
-            cat > test-output/execution-report.html <<EOF
-          <!DOCTYPE html>
-          <html>
-          <head><title>Test Execution Report</title></head>
-          <body>
-            <h1>Regression Test Execution</h1>
-            <p>Execution completed at: $(date)</p>
-            <p>Check artifacts for detailed results</p>
-          </body>
-          </html>
-          EOF
-          fi
-
-      # 🔟 Publish Test Results to GitHub
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always() && hashFiles('regression-test-suite/target/surefire-reports/*.xml') != ''
-        with:
-          name: Regression Test Results
-          path: 'regression-test-suite/target/surefire-reports/*.xml'
-          reporter: java-junit
-          fail-on-error: false
-
-      # 1️⃣1️⃣ Upload Surefire Test Reports
-      - name: Upload Surefire Test Reports
+      # 9️⃣ Upload test reports (Surefire)
+      - name: Upload Surefire Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports-${{ github.run_number }}
-          path: |
-            regression-test-suite/target/surefire-reports/**/*
+          path: regression-test-suite/target/surefire-reports/**/*.xml
           retention-days: 30
           if-no-files-found: warn
 
-      # 1️⃣2️⃣ Upload Custom HTML & CSV Reports
-      - name: Upload Custom Test Reports
+      # 🔟 Upload any generated test output or artifacts
+      - name: Upload Custom Reports and Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: custom-test-reports-${{ github.run_number }}
+          name: test-outputs-${{ github.run_number }}
           path: |
-            regression-test-suite/test-output/**/*.html
-            regression-test-suite/test-output/**/*.csv
-            regression-test-suite/test-output/**/*.xml
-            regression-test-suite/test-output/**/*.json
+            regression-test-suite/test-output/**
+            regression-test-suite/artifacts/**
           retention-days: 30
-          if-no-files-found: warn
-
-      # 1️⃣3️⃣ Upload Screenshots & Artifacts
-      - name: Upload Test Artifacts (Screenshots, Logs, etc.)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-artifacts-${{ github.run_number }}
-          path: |
-            regression-test-suite/artifacts/**/*
-          retention-days: 30
-          if-no-files-found: warn
-
-      # 1️⃣4️⃣ Upload Maven Logs
-      - name: Upload Maven Logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-logs-${{ github.run_number }}
-          path: |
-            regression-test-suite/target/**/*.log
-          retention-days: 7
           if-no-files-found: ignore
-
-      # 1️⃣5️⃣ Generate Test Summary
-      - name: Generate Test Summary
-        if: always()
-        working-directory: regression-test-suite
-        run: |
-          echo "## 🧪 Regression Test Execution Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Execution Time**: $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # Count test files
-          SUREFIRE_COUNT=$(find target/surefire-reports -name "*.xml" 2>/dev/null | wc -l || echo "0")
-          CUSTOM_COUNT=$(find test-output -name "*.html" -o -name "*.csv" 2>/dev/null | wc -l || echo "0")
-          ARTIFACT_COUNT=$(find artifacts -type f 2>/dev/null | wc -l || echo "0")
-          
-          echo "### 📊 Generated Files:" >> $GITHUB_STEP_SUMMARY
-          echo "- **Surefire Reports**: $SUREFIRE_COUNT files" >> $GITHUB_STEP_SUMMARY
-          echo "- **Custom Reports**: $CUSTOM_COUNT files" >> $GITHUB_STEP_SUMMARY
-          echo "- **Artifacts**: $ARTIFACT_COUNT files" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📥 Download Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "All reports and artifacts are available in the **Artifacts** section of this workflow run." >> $GITHUB_STEP_SUMMARY
